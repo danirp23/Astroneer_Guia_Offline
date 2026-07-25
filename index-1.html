@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Astropedia · Enciclopedia offline de Astroneer</title>
+<style>
+/* ============================================================
+   ASTROPEDIA — hoja de estilos
+   Paleta inspirada en el HUD de Astroneer: azul-noche profundo,
+   paneles flotantes redondeados y acentos naranja "traje EXO".
+   ============================================================ */
+:root{
+  --bg:            #13213d;
+  --bg-soft:       #0f244e;
+  --panel:         #171f31;
+  --panel-2:       #1c2333;
+  --panel-hover:   #212a3d;
+  --border:        #2a3247;
+  --border-soft:   #232a3c;
+  --text:          #e9edf5;
+  --text-dim:      #9aa5bd;
+  --text-faint:    #6b7590;
+  --accent:        #ff8a3d;
+  --accent-2:      #ffb066;
+  --accent-dim:    #cf6a25;
+  --accent-glow:   rgba(255,138,61,.35);
+  --blue:          #4fd6ff;
+  --green:         #6bdc9c;
+  --purple:        #b78bff;
+  --red:           #ff6b6b;
+  --radius-lg:     18px;
+  --radius-md:     12px;
+  --radius-sm:     8px;
+  --shadow:        0 8px 30px rgba(0,0,0,.45);
+  --sidebar-w:     252px;
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(255,138,61,.08), transparent 60%),
+    radial-gradient(900px 600px at -10% 100%, rgba(79,214,255,.06), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--accent-glow);}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent-dim);}
+
+a{color:var(--accent-2);text-decoration:none;}
+h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:.2px;}
+p{margin:0;}
+
+/* ---------- layout shell ---------- */
+#app{display:flex;min-height:100vh;}
+
+/* ---------- sidebar ---------- */
+#sidebar{
+  width:var(--sidebar-w);
+  flex-shrink:0;
+  background:linear-gradient(180deg, var(--panel), var(--bg-soft));
+  border-right:1px solid var(--border-soft);
+  padding:20px 14px 14px;
+  position:fixed;
+  top:0;left:0;bottom:0;
+  overflow-y:auto;
+  z-index:50;
+  transition:transform .25s ease;
+}
+.brand{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 10px 18px;
+  border-bottom:1px solid var(--border-soft);
+  margin-bottom:14px;
+}
+.brand-badge{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;justify-content:center;
+  font-size:20px;
+  flex-shrink:0;
+}
+.brand-text .t1{font-size:16px;font-weight:800;color:var(--text);}
+.brand-text .t2{font-size:10.5px;color:var(--text-faint);letter-spacing:.6px;text-transform:uppercase;}
+
+nav.menu{display:flex;flex-direction:column;gap:2px;}
+.menu-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--radius-sm);
+  color:var(--text-dim);cursor:pointer;font-size:14px;font-weight:600;
+  border:1px solid transparent;
+  transition:background .15s, color .15s, border-color .15s, transform .1s;
+  user-select:none;
+}
+.menu-item:hover{background:var(--panel-2);color:var(--text);}
+.menu-item.active{
+  background:linear-gradient(90deg, rgba(255,138,61,.16), rgba(255,138,61,.03));
+  color:var(--accent-2);border-color:rgba(255,138,61,.25);
+}
+.menu-item .ic{font-size:16px;width:20px;text-align:center;}
+.menu-item .count{
+  margin-left:auto;font-size:10.5px;color:var(--text-faint);
+  background:var(--bg-soft);padding:2px 7px;border-radius:20px;
+}
+.menu-item.active .count{color:var(--accent);}
+.menu-sep{height:1px;background:var(--border-soft);margin:10px 6px;}
+
+#sidebar-footer{margin-top:16px;padding:10px 12px;font-size:11px;color:var(--text-faint);line-height:1.5;}
+
+/* ---------- main column ---------- */
+#main-col{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column;}
+
+#topbar{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;gap:12px;
+  padding:14px 26px;
+  background:rgba(19, 25, 39, 0.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-soft);
+}
+#menu-toggle{display:none;}
+.search-wrap{
+  flex:1;max-width:640px;position:relative;
+}
+.search-wrap input{
+  width:100%;padding:11px 16px 11px 42px;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:999px;color:var(--text);font-size:14px;outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+.search-wrap input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-glow);}
+.search-wrap .sic{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:15px;pointer-events:none;}
+.search-results{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;
+  background:var(--panel-2);border:1px solid var(--border);
+  border-radius:var(--radius-md);box-shadow:var(--shadow);
+  max-height:420px;overflow-y:auto;display:none;z-index:60;
+}
+.search-results.show{display:block;}
+.sr-item{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  cursor:pointer;border-bottom:1px solid var(--border-soft);
+}
+.sr-item:last-child{border-bottom:none;}
+.sr-item:hover{background:var(--panel-hover);}
+.sr-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.sr-txt .name{font-size:13.5px;font-weight:600;color:var(--text);}
+.sr-txt .cat{font-size:11px;color:var(--text-faint);}
+.sr-empty{padding:16px;text-align:center;color:var(--text-faint);font-size:13px;}
+
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.btn-ghost{
+  background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
+  padding:9px 14px;border-radius:999px;font-size:13px;cursor:pointer;font-weight:600;
+  transition:.15s;white-space:nowrap;
+}
+.btn-ghost:hover{color:var(--text);border-color:var(--accent-dim);}
+
+#content{padding:26px 30px 80px;max-width:1280px;width:100%;}
+
+/* ---------- generic section header ---------- */
+.section-head{margin-bottom:22px;}
+.section-eyebrow{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--accent);font-weight:700;margin-bottom:6px;
+}
+.section-title{font-size:26px;font-weight:800;}
+.section-desc{color:var(--text-dim);font-size:14px;margin-top:6px;max-width:760px;line-height:1.55;}
+
+/* ---------- stat grid (home) ---------- */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin:22px 0 30px;}
+.stat-card{
+  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
+  padding:18px 18px;position:relative;overflow:hidden;transition:transform .15s, border-color .15s;
+}
+.stat-card:hover{transform:translateY(-3px);border-color:var(--accent-dim);}
+.stat-card .num{font-size:30px;font-weight:800;color:var(--accent-2);}
+.stat-card .lbl{font-size:12px;color:var(--text-dim);margin-top:4px;}
+.stat-card .glow{position:absolute;right:-20px;top:-20px;width:80px;height:80px;background:var(--accent);opacity:.08;border-radius:50%;filter:blur(10px);}
+
+.home-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;}
+@media(max-width:1000px){.home-grid{grid-template-columns:1fr;}}
+.panel{
+  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
+  padding:20px;
+}
+.panel h3{font-size:15px;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.mini-list{display:flex;flex-direction:column;gap:8px;}
+.mini-row{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);
+  cursor:pointer;transition:background .15s;
+}
+.mini-row:hover{background:var(--panel-2);}
+.mini-row .mi-name{font-size:13.5px;font-weight:600;}
+.mini-row .mi-sub{font-size:11px;color:var(--text-faint);margin-left:auto;}
+
+/* ---------- planet chip row on home ---------- */
+.planet-strip{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.planet-chip{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;
+  background:var(--panel-2);border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:600;
+  transition:.15s;
+}
+.planet-chip:hover{border-color:var(--accent-dim);color:var(--accent-2);}
+
+/* ---------- card grids ---------- */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.chip{
+  padding:7px 14px;border-radius:999px;background:var(--panel);border:1px solid var(--border);
+  font-size:12.5px;font-weight:600;color:var(--text-dim);cursor:pointer;transition:.15s;
+}
+.chip:hover{color:var(--text);}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#1a0f05;}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+
+.res-card{
+  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-md);
+  padding:16px;cursor:pointer;position:relative;transition:transform .15s, border-color .15s, box-shadow .15s;
+  display:flex;flex-direction:column;gap:10px;
+}
+.res-card:hover{transform:translateY(-3px);border-color:var(--accent-dim);box-shadow:var(--shadow);}
+.res-card .top-row{display:flex;align-items:center;gap:10px;}
+.res-icon{
+  width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+}
+.res-card .rc-name{font-size:14.5px;font-weight:700;color:var(--text);}
+.res-card .rc-en{font-size:11px;color:var(--text-faint);}
+.fav-btn{
+  margin-left:auto;background:none;border:none;color:var(--text-faint);font-size:16px;cursor:pointer;
+  padding:2px 4px;border-radius:6px;transition:.15s;
+}
+.fav-btn:hover{color:var(--accent);}
+.fav-btn.active{color:var(--accent);}
+.rc-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tag{font-size:10px;padding:3px 8px;border-radius:6px;background:var(--panel-2);color:var(--text-dim);font-weight:600;letter-spacing:.3px;}
+.stars{font-size:11px;color:var(--accent-2);letter-spacing:1px;}
+.rc-desc{font-size:12px;color:var(--text-dim);line-height:1.45;}
+
+/* ---------- detail / modal ---------- */
+#overlay{
+  position:fixed;inset:0;background:rgba(6,8,13,.72);backdrop-filter:blur(3px);
+  display:none;align-items:flex-start;justify-content:center;z-index:100;padding:40px 16px;overflow-y:auto;
+}
+#overlay.show{display:flex;}
+.detail-modal{
+  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);
+  width:100%;max-width:760px;box-shadow:0 30px 60px rgba(0,0,0,.6);animation:pop .18s ease;
+}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:none;}}
+.detail-head{
+  display:flex;align-items:flex-start;gap:16px;padding:24px 26px;border-bottom:1px solid var(--border-soft);
+  position:relative;
+}
+.detail-icon{
+  width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.detail-title h2{font-size:21px;}
+.detail-title .en{font-size:12.5px;color:var(--text-faint);margin-top:2px;}
+.detail-title .rc-tags{margin-top:8px;}
+.close-x{
+  position:absolute;top:18px;right:20px;background:var(--panel-2);border:1px solid var(--border);
+  color:var(--text-dim);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;
+}
+.close-x:hover{color:var(--text);}
+.detail-body{padding:6px 26px 26px;}
+.dsec{margin-top:20px;}
+.dsec h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px;}
+.dsec p, .dsec div.txt{font-size:13.5px;color:var(--text-dim);line-height:1.6;}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.kv{background:var(--bg-soft);border:1px solid var(--border-soft);border-radius:var(--radius-sm);padding:10px 12px;}
+.kv .k{font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;}
+.kv .v{font-size:13.5px;font-weight:600;color:var(--text);margin-top:3px;}
+.pill-row{display:flex;flex-wrap:wrap;gap:7px;}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;background:var(--panel-2);border:1px solid var(--border);
+  padding:6px 11px;border-radius:999px;font-size:12.5px;cursor:pointer;transition:.15s;
+}
+.pill:hover{border-color:var(--accent-dim);color:var(--accent-2);}
+.pill .qty{color:var(--accent-2);font-weight:700;}
+.method-flags{display:flex;gap:8px;flex-wrap:wrap;}
+.mflag{font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);color:var(--text-faint);}
+.mflag.yes{color:var(--green);border-color:rgba(107,220,156,.3);background:rgba(107,220,156,.06);}
+
+/* recipe tree */
+.tree{padding-left:0;}
+.tree-node{margin:4px 0;}
+.tree-row{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);
+  background:var(--bg-soft);border:1px solid var(--border-soft);cursor:pointer;font-size:13px;
+  transition:.15s;
+}
+.tree-row:hover{border-color:var(--accent-dim);}
+.tree-row .qty{color:var(--accent-2);font-weight:700;font-size:12px;}
+.tree-children{margin-left:22px;border-left:1px dashed var(--border);padding-left:14px;margin-top:4px;}
+.tree-arrow{color:var(--text-faint);font-size:12px;}
+
+.trivia-box{
+  background:linear-gradient(120deg, rgba(255,138,61,.08), transparent);
+  border:1px solid rgba(255,138,61,.2);border-radius:var(--radius-md);padding:12px 14px;font-size:13px;
+  color:var(--text-dim);line-height:1.5;
+}
+
+/* planets */
+.planet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.planet-card{
+  border-radius:var(--radius-lg);padding:20px;cursor:pointer;position:relative;overflow:hidden;
+  border:1px solid var(--border-soft);transition:transform .15s;min-height:150px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+.planet-card:hover{transform:translateY(-4px);}
+.planet-card .pc-orb{
+  position:absolute;top:-30px;right:-30px;width:110px;height:110px;border-radius:50%;opacity:.5;filter:blur(2px);
+}
+.planet-card h3{font-size:19px;position:relative;z-index:1;}
+.planet-card .sub{font-size:12px;color:var(--text-dim);position:relative;z-index:1;margin-top:4px;}
+.diff-row{display:flex;gap:5px;margin-top:10px;position:relative;z-index:1;}
+.diff-dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.diff-dot.on{background:var(--accent);}
+
+/* footer / empty states */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-faint);}
+.empty-state .em-ic{font-size:38px;margin-bottom:10px;}
+
+#backtop{
+  position:fixed;right:26px;bottom:26px;width:46px;height:46px;border-radius:50%;
+  background:var(--accent);color:#1a0f05;border:none;font-size:18px;cursor:pointer;
+  box-shadow:0 8px 22px var(--accent-glow);display:none;align-items:center;justify-content:center;z-index:70;
+  transition:transform .15s;
+}
+#backtop:hover{transform:translateY(-3px);}
+#backtop.show{display:flex;}
+
+.toast{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--panel-2);border:1px solid var(--accent-dim);color:var(--text);
+  padding:11px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:200;opacity:0;
+  transition:.25s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* mobile */
+#mobile-topbar{display:none;}
+@media(max-width:900px){
+  #sidebar{transform:translateX(-100%);box-shadow:20px 0 40px rgba(0,0,0,.5);}
+  #sidebar.open{transform:translateX(0);}
+  #main-col{margin-left:0;}
+  #mobile-topbar{
+    display:flex;align-items:center;gap:12px;padding:14px 16px;position:sticky;top:0;z-index:45;
+    background:var(--bg-soft);border-bottom:1px solid var(--border-soft);
+  }
+  #menu-toggle{
+    display:flex;background:var(--panel);border:1px solid var(--border);color:var(--text);
+    width:38px;height:38px;border-radius:10px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0;
+  }
+  #topbar{padding:10px 14px;}
+  #content{padding:18px 14px 90px;}
+  .kv-grid{grid-template-columns:1fr;}
+  .home-grid{grid-template-columns:1fr;}
+  #sidebar-scrim{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49;
+  }
+  #sidebar-scrim.show{display:block;}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="brand-badge">
+        <img src="https://static.wikia.nocookie.net/astroneer_es_gamepedia/images/e/e6/Site-logo.png/revision/latest?cb=20210719063732"
+           alt="Logo Astroneer">
+      </div>
+      <div class="brand-text">
+        <div class="t1">Astropedia</div>
+        <div class="t2">Guía offline · ES</div>
+      </div>
+    </div>
+    <nav class="menu" id="menu"></nav>
+    <div id="sidebar-footer">
+      Datos contrastados con la wiki oficial de Astroneer (System Era Softworks). Uso de fan no oficial, sin conexión a internet.
+    </div>
+  </aside>
+  <div id="sidebar-scrim" onclick="closeSidebar()"></div>
+
+  <!-- ===================== MAIN COLUMN ===================== -->
+  <div id="main-col">
+    <div id="mobile-topbar">
+      <button id="menu-toggle" onclick="openSidebar()">☰</button>
+      <div style="font-weight:800;">Astropedia</div>
+    </div>
+
+    <div id="topbar">
+      <div class="search-wrap">
+        <span class="sic">🔍</span>
+        <input id="search-input" type="text" placeholder="Buscar recursos, objetos, vehículos, gases, planetas..." autocomplete="off">
+        <div class="search-results" id="search-results"></div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost" onclick="navigate('favoritos')">⭐ Favoritos</button>
+      </div>
+    </div>
+
+    <div id="content"></div>
+  </div>
+</div>
+
+<div id="overlay" onclick="if(event.target===this) closeDetail()">
+  <div class="detail-modal" id="detail-modal"></div>
+</div>
+
+<button id="backtop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================================================================================
+   ASTROPEDIA — base de datos
+   Toda la información del juego vive en este objeto. Para añadir contenido nuevo
+   basta con agregar una entrada más a la lista correspondiente: el resto de la
+   aplicación (buscador, tarjetas, árboles de fabricación, favoritos, planetas...)
+   la detecta automáticamente.
+   ================================================================================== */
+
+const PLANETS = [
+  {id:'sylva',   name:'Sylva',   icon:'https://static.wikia.nocookie.net/astroneer_gamepedia/images/d/d2/Icon_Sylva.png/revision/latest?cb=20200125062932', color:'#6bdc9c', order:1,
+    desc:'El planeta natal e inicio de toda partida. Bosques, colinas y cuevas moderadas. El mejor lugar para aprender las bases del juego.',
+    difficulty:1, level:'Inicial', primary:'Laterite', secondary:'Sphalerite',
+    exclusive:'Laterite y Sphalerite en abundancia; también hay Malachite y Ammonium.',
+    gases:['Hydrogen','Nitrogen'], risks:'Fauna hostil escasa; algunas plantas explosivas y espinas.',
+    tips:'Construye tu base cerca de una cueva con Compound y Resin visibles: te ahorrará muchos viajes al principio.'},
+  {id:'desolo',  name:'Desolo',  icon:'https://static.wikia.nocookie.net/astroneer_gamepedia/images/0/0e/Icon_Desolo.png/revision/latest?cb=20200125062926', color:'#9aa5bd', order:2,
+    desc:'Luna árida de Sylva, pequeña y sin atmósfera. Ideal para una primera excursión corta en cohete.',
+    difficulty:1, level:'Temprano', primary:'Laterite', secondary:'Wolframite',
+    exclusive:'Wolframite (Tungsteno) en cuevas; Sphalerite en montañas.',
+    gases:[], risks:'Sin gases que recolectar (no tiene atmósfera). Terreno con cráteres pronunciados.',
+    tips:'Aunque no tiene gases, es la fuente más cómoda de Wolframite para tu primer Chemistry Lab.'},
+  {id:'calidor',name:'Calidor', icon:'https://static.wikia.nocookie.net/astroneer_gamepedia/images/f/f6/Icon_Calidor.png/revision/latest?cb=20200125062924', color:'#ffb066', order:3,
+    desc:'Un desierto cálido y ventoso, segundo planeta desde la estrella. Buen sitio para paneles solares.',
+    difficulty:2, level:'Temprano-medio', primary:'Malachite', secondary:'Titanite',
+    exclusive:'Grandes yacimientos de Malachite (Copper) y Titanite (Titanium).',
+    gases:['Sulfur','Methane'], risks:'Tormentas de arena que reducen visibilidad; fauna territorial.',
+    tips:'Trae suficiente energía solar: la alta insolación hace que los paneles rindan al máximo aquí.'},
+  {id:'vesania', name:'Vesania', icon:'https://static.wikia.nocookie.net/astroneer_gamepedia/images/f/fd/Icon_Vesania.png/revision/latest?cb=20200125062933', color:'#b78bff', order:4,
+    desc:'Un mundo exótico cubierto de vegetación densa y colinas onduladas. Alberga enormes vetas de Litio.',
+    difficulty:3, level:'Medio', primary:'Lithium', secondary:'Quartz',
+    exclusive:'Litio en grandes cantidades; Hematite en cuevas profundas.',
+    gases:['Hydrogen','Nitrogen','Methane'], risks:'Vegetación agresiva y terreno muy irregular; fácil perderse en cuevas profundas.',
+    tips:'Es la mejor fuente de Litio del juego: llévate varios contenedores llenos antes de irte.'},
+  {id:'novus',   name:'Novus',   icon:'https://static.wikia.nocookie.net/astroneer_gamepedia/images/1/1c/Icon_Novus.png/revision/latest?cb=20200125062930', color:'#4fd6ff', order:5,
+    desc:'Luna de Vesania con un ciclo día/noche muy corto (unos 210 segundos). Rica en Hematite y Laterite.',
+    difficulty:2, level:'Medio', primary:'Hematite', secondary:'Laterite',
+    exclusive:'Clústeres densos de Hematite y Laterite; Litio y Ammonium en menor medida.',
+    gases:['Hydrogen','Methane'], risks:'El día/noche rápido complica la energía solar; conviene usar viento o baterías grandes.',
+    tips:'Buena parada rápida para reponer combustible (Hydrazine) y batería antes de ir a Glacio o Atrox.'},
+  {id:'glacio',  name:'Glacio',  icon:'https://static.wikia.nocookie.net/astroneer_gamepedia/images/d/dc/Icon_Glacio.png/revision/latest?cb=20200125062928', color:'#dfefff', order:6,
+    desc:'El planeta más alejado de la estrella: paisajes helados y el mejor lugar para Titanium e Iron.',
+    difficulty:4, level:'Avanzado', primary:'Hematite', secondary:'Titanite',
+    exclusive:'Iron y Titanium en abundancia; también Litio, Ammonium, Clay y Quartz.',
+    gases:['Argon'], risks:'Frío extremo, ciclos día/noche largos (~20 min) con poca luz solar efectiva; usa energía eólica o RTG.',
+    tips:'Es la mejor fuente de Argon del juego, esencial para el Steel y el Titanium Alloy.'},
+  {id:'atrox',   name:'Atrox',   icon:'https://static.wikia.nocookie.net/astroneer_gamepedia/images/5/5c/Icon_Atrox.png/revision/latest?cb=20200125062922', color:'#ff6b6b', order:7,
+    desc:'El planeta más cercano a la estrella: niebla tóxica, plantas muy agresivas y el único lugar con Helio.',
+    difficulty:5, level:'Avanzado / endgame', primary:'—', secondary:'—',
+    exclusive:'Ningún recurso sólido exclusivo (solo universales), pero es la única fuente de Helium.',
+    gases:['Helium','Methane','Nitrogen','Sulfur'], risks:'Niebla dañina, flora extremadamente hostil y terreno traicionero. Ve preparado con buen traje y oxígeno.',
+    tips:'Necesitarás Helio para el Nanocarbon Alloy: trae contenedores de gas vacíos y un vehículo resistente.'}
+];
+
+// Ayuda para lookup rápido de planetas
+const PLANET_MAP = Object.fromEntries(PLANETS.map(p=>[p.id,p]));
+
+/* ---------------- RECURSOS (natural, refinado, gas, compuesto) ---------------- */
+const RESOURCES = [
+  // ---------- NATURALES ----------
+  {id:'compound', name:'Compuesto', en:'Compound', type:'natural', color:'#c9ccd6', icon:'⚪', rarity:'Muy común', importance:2,
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
+   obtain:'Se extrae con la Herramienta de Terreno de racimos de esferas grises azuladas, presentes en todos los planetas.',
+   process:'No se refina; se usa directamente. También se puede producir 8 unidades con la Centrifugadora de Tierra usando 2 cargas de Soil.',
+   centrifuge:true, furnace:false, lab:false,
+   recipe:[], tips:'Es de los recursos más usados del juego: guarda siempre un contenedor lleno en la base.',
+   trivia:'Antes de la versión 0.4.10221.0 también aparecía en las "spires" (torres) del terreno, eliminadas posteriormente.'},
+  {id:'resin', name:'Resina', en:'Resin', type:'natural', color:'#e7c98f', icon:'🟠', rarity:'Muy común', importance:2,
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
+   obtain:'Depósitos de color ámbar/dorado en la superficie y cuevas de todos los planetas.',
+   process:'No se refina; se usa directamente en fabricación e impresión.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Es el recurso base de casi todas las plataformas e items de impresora pequeña.',
+   trivia:'Junto con Compound, formaba parte de las recompensas de las spires antes de que estas fuesen retiradas.'},
+  {id:'organic', name:'Orgánico', en:'Organic', type:'natural', color:'#8fdc7a', icon:'🌿', rarity:'Común', importance:3,
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
+   obtain:'Se obtiene recolectando flora (plantas, hongos, arbustos) con la Herramienta de Terreno.',
+   process:'Puede refinarse en la Fundidora para obtener Carbono, o quemarse en un generador para producir energía (destruye el recurso).',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'Muy útil como combustible de generadores en las primeras horas de partida, antes de tener paneles solares.',
+   trivia:'Distintas plantas de cada planeta producen Orgánico de apariencia distinta, aunque funcionalmente es el mismo recurso.'},
+  {id:'quartz', name:'Cuarzo', en:'Quartz', type:'natural', color:'#dcdff0', icon:'🔷', rarity:'Poco común', importance:3,
+   found:['sylva','vesania','glacio'],
+   obtain:'Cristales prismáticos translúcidos que se encuentran en cuevas y afloramientos rocosos.',
+   process:'Se puede usar en bruto o refinar en la Fundidora para obtener Vidrio (Glass).',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'Guarda algo de Cuarzo sin refinar: lo necesitarás también para el Silicone en el Chemistry Lab.',
+   trivia:'Es uno de los pocos recursos naturales que tiene uso tanto en bruto como refinado.'},
+  {id:'clay', name:'Arcilla', en:'Clay', type:'natural', color:'#c98a5c', icon:'🟤', rarity:'Poco común', importance:2,
+   found:['vesania','novus','glacio'],
+   obtain:'Depósitos de tono rojizo-marrón en superficie, normalmente en zonas onduladas.',
+   process:'Se refina en la Fundidora para producir Cerámica (Ceramic).',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'No tiene mucho uso sin refinar: fúndela en cuanto puedas para obtener Cerámica.',
+   trivia:'Es de los pocos recursos que no aparece en Sylva, por lo que muchos jugadores la traen en su primer viaje en cohete.'},
+  {id:'laterite', name:'Laterita', en:'Laterite', type:'natural', color:'#c94f3f', icon:'🔺', rarity:'Común', importance:4,
+   found:['sylva','desolo','novus','glacio'],
+   obtain:'Depósitos cilíndricos rojos y azules bajo la superficie, presentes en casi todos los planetas.',
+   process:'Se refina en la Fundidora para obtener Aluminio (Aluminum).',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'La Plataforma de Comercio da hasta 8 Laterita por 8 Scrap: úsala si te quedas corto.',
+   trivia:'Fue el primer recurso "refinable" que se implementó en el juego, en el logro Smelteringly Hot.'},
+  {id:'malachite', name:'Malaquita', en:'Malachite', type:'natural', color:'#4fae7a', icon:'💚', rarity:'Común (Calidor)', importance:4,
+   found:['sylva','calidor'],
+   obtain:'Vetas de tono verde intenso, muy abundantes en el desierto de Calidor.',
+   process:'Se refina en la Fundidora para obtener Cobre (Copper).',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'Calidor es la mejor fuente si necesitas Cobre para la Chemistry Lab o el Aluminum Alloy.',
+   trivia:'Su color viene del mineral real malaquita, un carbonato de cobre.'},
+  {id:'hematite', name:'Hematita', en:'Hematite', type:'natural', color:'#8a4a3d', icon:'🔻', rarity:'Común (Novus/Glacio)', importance:4,
+   found:['vesania','novus','glacio'],
+   obtain:'Depósitos de color rojo oscuro que se concentran especialmente en Novus y Glacio.',
+   process:'Se refina en la Fundidora para obtener Hierro (Iron).',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'Consigue grandes cantidades en Novus antes de ir a Glacio, así podrás fabricar Steel sin escasez.',
+   trivia:'Nombrada por el mineral real de óxido de hierro que le da su color rojizo.'},
+  {id:'titanite', name:'Titanita', en:'Titanite', type:'natural', color:'#d9d2c0', icon:'⬛', rarity:'Poco común', importance:4,
+   found:['calidor','glacio'],
+   obtain:'Vetas de tono beige/gris claro, típicas de zonas rocosas y montañosas.',
+   process:'Se refina en la Fundidora para obtener Titanio (Titanium).',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'Es un cuello de botella habitual para el Titanium Alloy: acumula varias unidades antes de empezar la cadena de Nanocarbon.',
+   trivia:'El Titanio resultante es uno de los metales más resistentes usados en vehículos avanzados.'},
+  {id:'wolframite', name:'Wolframita', en:'Wolframite', type:'natural', color:'#5b5f6b', icon:'⚫', rarity:'Poco común', importance:3,
+   found:['desolo','calidor'],
+   obtain:'Depósitos oscuros y densos, comunes en las cuevas de Desolo.',
+   process:'Se refina en la Fundidora para obtener Tungsteno (Tungsten).',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'Necesario para el Chemistry Lab (vía Copper) y para el Tungsten Carbide: trae bastante desde tu primer viaje a Desolo.',
+   trivia:'El Tungsteno es el metal con mayor punto de fusión del universo del juego, reflejando su alta densidad en la realidad.'},
+  {id:'sphalerite', name:'Esfalerita', en:'Sphalerite', type:'natural', color:'#caa6d9', icon:'🔶', rarity:'Poco común', importance:2,
+   found:['sylva','desolo'],
+   obtain:'Cristales de tono violáceo, frecuentes en las montañas de Sylva y Desolo.',
+   process:'Se refina en la Fundidora para obtener Zinc.',
+   centrifuge:false, furnace:true, lab:false,
+   recipe:[], tips:'El Zinc tiene pocos usos directos de fabricación, pero es útil para investigación temprana de bytes.',
+   trivia:'Su nombre proviene del mineral real, principal fuente de zinc en la minería terrestre.'},
+  {id:'lithium', name:'Litio', en:'Lithium', type:'natural', color:'#f2a6c9', icon:'💗', rarity:'Abundante en Vesania', importance:3,
+   found:['vesania','novus','glacio'],
+   obtain:'Nódulos en forma de fideos rizados rosados y dorados, muy abundantes en Vesania.',
+   process:'No se puede refinar; se utiliza en bruto.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Se usa sobre todo en baterías y componentes de investigación: trae bastante de Vesania para toda la partida.',
+   trivia:'Es de los pocos metales que el juego trata como "no refinable", a diferencia del resto de minerales.'},
+  {id:'ammonium', name:'Amonio', en:'Ammonium', type:'natural', color:'#f5d34a', icon:'🟡', rarity:'Poco común', importance:4,
+   found:['sylva','vesania','novus','glacio'],
+   obtain:'Depósitos amarillos brillantes, normalmente cerca de zonas de aterrizaje y cuevas superficiales.',
+   process:'No se refina; se usa directamente en el Chemistry Lab.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Es clave para el Hydrazine (combustible de cohetes y cinturones): nunca viajes sin una reserva.',
+   trivia:'Es uno de los pocos recursos naturales que alimenta directamente al Chemistry Lab sin pasar por la Fundidora.'},
+  {id:'astronium', name:'Astronio', en:'Astronium', type:'natural', color:'#ffdf7e', icon:'✨', rarity:'Muy raro', importance:3,
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
+   obtain:'Pequeños depósitos brillantes y raros, dispersos por todos los planetas; también aparece en naufragios.',
+   process:'No se refina; se comercia directamente en la Plataforma de Comercio (da la mejor tasa de Scrap: 3 Scrap por unidad).',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Guárdalo para canjearlo por Scrap cuando necesites materiales puntuales que no tengas a mano.',
+   trivia:'Es de los recursos más difíciles de encontrar en grandes cantidades, ideal como "moneda" de intercambio.'},
+  {id:'graphite', name:'Grafito', en:'Graphite', type:'natural', color:'#3a3f4a', icon:'⬜', rarity:'Común', importance:4,
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
+   obtain:'Vetas oscuras y laminares presentes en todos los planetas.',
+   process:'No se puede refinar; se usa directamente en el Chemistry Lab.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Es la base del Graphene, así que conviene tener siempre unidades de reserva.',
+   trivia:'Al igual que Compound y Resin, se catalogó desde el inicio como recurso "no refinable".'},
+  {id:'soil', name:'Tierra', en:'Soil', type:'natural', color:'#7a6650', icon:'🟫', rarity:'Ilimitado', importance:1,
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
+   obtain:'Se genera automáticamente al excavar terreno con la Herramienta de Terreno.',
+   process:'Se introduce en la Centrifugadora de Tierra (Soil Centrifuge) para separarla en Compound, Resin u Organic según el bioma.',
+   centrifuge:true, furnace:false, lab:false,
+   recipe:[], tips:'No necesitas minarla a propósito: se acumula sola mientras excavas para hacer túneles y rampas.',
+   trivia:'La Centrifugadora de Tierra fue una de las incorporaciones que redujo la necesidad de "farmear" Compound y Resin a mano.'},
+
+  // ---------- REFINADOS (Fundidora) ----------
+  {id:'aluminum', name:'Aluminio', en:'Aluminum', type:'refined', color:'#cfd6de', icon:'🔩', rarity:'Común', importance:5,
+   found:['sylva','desolo','novus','glacio'],
+   obtain:'Se obtiene refinando Laterita en la Fundidora (Smelting Furnace).',
+   process:'Fundidora: 1 Laterite → 1 Aluminum.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'laterite',qty:1}],
+   tips:'Es de los metales más usados en estructuras y plataformas: mantén siempre una Fundidora activa.',
+   trivia:'El logro "Smelteringly Hot" se obtiene precisamente al fundir tu primer Aluminio.'},
+  {id:'copper', name:'Cobre', en:'Copper', type:'refined', color:'#e08a4f', icon:'🟠', rarity:'Común (Calidor)', importance:4,
+   found:['sylva','calidor'],
+   obtain:'Se obtiene refinando Malaquita en la Fundidora.',
+   process:'Fundidora: 1 Malachite → 1 Copper.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'malachite',qty:1}],
+   tips:'Imprescindible para el Chemistry Lab y el Aluminum Alloy: prioriza un viaje a Calidor pronto.',
+   trivia:'Es uno de los primeros refinados que se necesita para acceder a estructuras de nivel medio.'},
+  {id:'iron', name:'Hierro', en:'Iron', type:'refined', color:'#8c5a4a', icon:'⛓️', rarity:'Común (Novus/Glacio)', importance:4,
+   found:['vesania','novus','glacio'],
+   obtain:'Se obtiene refinando Hematita en la Fundidora.',
+   process:'Fundidora: 1 Hematite → 1 Iron.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'hematite',qty:1}],
+   tips:'Fundamental para el Steel: acumula un buen stock antes de intentar el Nanocarbon Alloy.',
+   trivia:'Combinado con Carbono y Argón en el Chemistry Lab produce Acero (Steel).'},
+  {id:'titanium', name:'Titanio', en:'Titanium', type:'refined', color:'#a9a29a', icon:'⚙️', rarity:'Poco común', importance:4,
+   found:['calidor','glacio'],
+   obtain:'Se obtiene refinando Titanita en la Fundidora.',
+   process:'Fundidora: 1 Titanite → 1 Titanium.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'titanite',qty:1}],
+   tips:'Es uno de los materiales más solicitados para vehículos grandes y el Titanium Alloy.',
+   trivia:'Aparece con más frecuencia en Glacio, lo que hace de ese planeta un destino habitual a mitad de partida.'},
+  {id:'tungsten', name:'Tungsteno', en:'Tungsten', type:'refined', color:'#4c4f57', icon:'🔗', rarity:'Poco común', importance:3,
+   found:['desolo','calidor'],
+   obtain:'Se obtiene refinando Wolframita en la Fundidora.',
+   process:'Fundidora: 1 Wolframite → 1 Tungsten.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'wolframite',qty:1}],
+   tips:'Base del Tungsten Carbide, un material clave para estructuras de gran resistencia.',
+   trivia:'Es de los metales más densos y "raros" de conseguir en las primeras horas.'},
+  {id:'zinc', name:'Zinc', en:'Zinc', type:'refined', color:'#8f7aa8', icon:'🧱', rarity:'Poco común', importance:2,
+   found:['sylva','desolo'],
+   obtain:'Se obtiene refinando Esfalerita en la Fundidora.',
+   process:'Fundidora: 1 Sphalerite → 1 Zinc.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'sphalerite',qty:1}],
+   tips:'Con menos recetas directas que otros metales, es buena fuente de bytes tempranos en el Research Chamber.',
+   trivia:'Uno de los refinados más "tranquilos" del juego: pocas veces resulta un cuello de botella.'},
+  {id:'glass', name:'Vidrio', en:'Glass', type:'refined', color:'#bfe6ea', icon:'🪟', rarity:'Poco común', importance:3,
+   found:['sylva','vesania','glacio'],
+   obtain:'Se obtiene refinando Cuarzo en la Fundidora.',
+   process:'Fundidora: 1 Quartz → 1 Glass.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'quartz',qty:1}],
+   tips:'Se usa en varios objetos de investigación y decorativos; no acumula tanta demanda como los metales.',
+   trivia:'Comparte origen con el Silicone, que en cambio usa Cuarzo sin refinar.'},
+  {id:'ceramic', name:'Cerámica', en:'Ceramic', type:'refined', color:'#e3b98f', icon:'🏺', rarity:'Poco común', importance:2,
+   found:['vesania','novus','glacio'],
+   obtain:'Se obtiene refinando Arcilla en la Fundidora.',
+   process:'Fundidora: 1 Clay → 1 Ceramic.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'clay',qty:1}],
+   tips:'Poco exigida en recetas avanzadas, pero útil para completar el catálogo de investigación temprano.',
+   trivia:'Como la Arcilla no aparece en Sylva, muchos jugadores la descubren tarde en la partida.'},
+  {id:'carbon', name:'Carbono', en:'Carbon', type:'refined', color:'#2c2f36', icon:'⚫', rarity:'Común', importance:5,
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
+   obtain:'Se obtiene refinando Orgánico en la Fundidora.',
+   process:'Fundidora: 1 Organic → 1 Carbon.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[{id:'organic',qty:1}],
+   tips:'Es ingrediente de Plastic, Steel, Explosive Powder y Tungsten Carbide: nunca te quedes sin Orgánico de reserva.',
+   trivia:'También puede quemarse en un generador para producir energía, aunque destruye el recurso en el proceso.'},
+
+  // ---------- GASES (Condensador Atmosférico) ----------
+  {id:'argon', name:'Argón', en:'Argon', type:'gas', color:'#7ab8ff', icon:'☁️', rarity:'Exclusivo de Glacio', importance:4,
+   found:['glacio'],
+   obtain:'Único gas disponible en Glacio; se recolecta con el Condensador Atmosférico.',
+   process:'Condensador Atmosférico (Atmospheric Condenser).',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Es la razón principal para instalar una base en Glacio: sin Argón no hay Steel ni Titanium Alloy.',
+   trivia:'Glacio es el único planeta con un solo tipo de gas atmosférico, según la wiki oficial.'},
+  {id:'helium', name:'Helio', en:'Helium', type:'gas', color:'#ffe08a', icon:'🎈', rarity:'Exclusivo de Atrox', importance:5,
+   found:['atrox'],
+   obtain:'Solo se encuentra en la atmósfera de Atrox; requiere Condensador Atmosférico.',
+   process:'Condensador Atmosférico.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Imprescindible para el Nanocarbon Alloy: planifica bien tu viaje a Atrox, ya que es el planeta más peligroso.',
+   trivia:'Es el único recurso auténticamente exclusivo de un solo planeta en todo el juego.'},
+  {id:'hydrogen', name:'Hidrógeno', en:'Hydrogen', type:'gas', color:'#c9e8ff', icon:'💨', rarity:'Común (varios planetas)', importance:5,
+   found:['sylva','vesania','novus'],
+   obtain:'Disponible en la atmósfera de Sylva, Vesania y Novus mediante Condensador Atmosférico.',
+   process:'Condensador Atmosférico.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Base del Hydrazine, el combustible de cohetes y VTOL: instala tu primer condensador en Sylva.',
+   trivia:'Aunque en el desarrollo se pensó en obtenerlo del hielo/agua, esa mecánica nunca llegó al juego final.'},
+  {id:'methane', name:'Metano', en:'Methane', type:'gas', color:'#8fd6a0', icon:'🌫️', rarity:'Común (varios planetas)', importance:3,
+   found:['calidor','vesania','novus','atrox'],
+   obtain:'Presente en la atmósfera de Calidor, Vesania, Novus y Atrox.',
+   process:'Condensador Atmosférico.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Necesario para el Silicone junto con Resin y Quartz.',
+   trivia:'Es de los gases más repartidos entre distintos planetas, por lo que rara vez escasea.'},
+  {id:'nitrogen', name:'Nitrógeno', en:'Nitrogen', type:'gas', color:'#a0c9ff', icon:'🌀', rarity:'Común (varios planetas)', importance:4,
+   found:['sylva','vesania','atrox'],
+   obtain:'Presente en la atmósfera de Sylva, Vesania y Atrox.',
+   process:'Condensador Atmosférico.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Clave para el Titanium Alloy: recoge bastante mientras estés en Sylva.',
+   trivia:'Junto al Hidrógeno, es uno de los dos gases presentes en tu planeta natal.'},
+  {id:'sulfur', name:'Azufre', en:'Sulfur', type:'gas', color:'#f5e05a', icon:'🟨', rarity:'Poco común', importance:3,
+   found:['calidor','atrox'],
+   obtain:'Presente en la atmósfera de Calidor y Atrox.',
+   process:'Condensador Atmosférico.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[], tips:'Necesario para el Explosive Powder: si vas a fabricar dinamita en masa, trae varios tanques desde Calidor.',
+   trivia:'Es uno de los gases menos comunes junto al Argón y el Helio.'},
+
+  // ---------- COMPUESTOS (Chemistry Lab) ----------
+  {id:'rubber', name:'Caucho', en:'Rubber', type:'composite', color:'#3d3f46', icon:'🟢', rarity:'Fabricado', importance:4,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab combinando recursos naturales.',
+   process:'Chemistry Lab: 1 Organic + 1 Resin → 1 Rubber.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'organic',qty:1},{id:'resin',qty:1}],
+   tips:'Es de los primeros compuestos que se desbloquean; imprescindible para Small y Medium Shredder.',
+   trivia:'Es el único compuesto que no requiere ningún gas en su receta.'},
+  {id:'plastic', name:'Plástico', en:'Plastic', type:'composite', color:'#e7e9ef', icon:'🧴', rarity:'Fabricado', importance:5,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab a partir de Compound y Carbon.',
+   process:'Chemistry Lab: 1 Compound + 1 Carbon → 1 Plastic.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'compound',qty:1},{id:'carbon',qty:1}],
+   tips:'Muy demandado en estructuras y vehículos: automatiza su producción en cuanto tengas Auto Arm.',
+   trivia:'Al usar solo dos ingredientes muy comunes, suele ser el compuesto más fácil de producir en masa.'},
+  {id:'aluminum_alloy', name:'Aleación de Aluminio', en:'Aluminum Alloy', type:'composite', color:'#d7dbe3', icon:'🔗', rarity:'Fabricado', importance:4,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab combinando dos metales refinados.',
+   process:'Chemistry Lab: 1 Aluminum + 1 Copper → 1 Aluminum Alloy.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'aluminum',qty:1},{id:'copper',qty:1}],
+   tips:'Se usa en estructuras de plataforma media; asegura suministro constante de Aluminio y Cobre.',
+   trivia:'Es el único compuesto hecho exclusivamente de dos metales refinados, sin gas ni recurso natural.'},
+  {id:'tungsten_carbide', name:'Carburo de Tungsteno', en:'Tungsten Carbide', type:'composite', color:'#4a4d55', icon:'💎', rarity:'Fabricado', importance:3,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab a partir de Carbon y Tungsten.',
+   process:'Chemistry Lab: 1 Carbon + 1 Tungsten → 1 Tungsten Carbide.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'carbon',qty:1},{id:'tungsten',qty:1}],
+   tips:'Usado en piezas de gran resistencia estructural en la mitad-final del árbol tecnológico.',
+   trivia:'Comparte el Carbono como ingrediente con Plastic, Steel y Explosive Powder.'},
+  {id:'graphene', name:'Grafeno', en:'Graphene', type:'composite', color:'#5c5f66', icon:'🔳', rarity:'Fabricado', importance:5,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab a partir de Graphite y Hydrazine.',
+   process:'Chemistry Lab: 1 Graphite + 1 Hydrazine → 1 Graphene.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'graphite',qty:1},{id:'hydrazine',qty:1}],
+   tips:'Paso obligatorio hacia Diamond y Titanium Alloy: produce Hydrazine en cantidad antes de empezar esta cadena.',
+   trivia:'Es uno de los compuestos "intermedios" más usados, ya que alimenta a otros dos compuestos distintos.'},
+  {id:'diamond', name:'Diamante', en:'Diamond', type:'composite', color:'#eaf6ff', icon:'💠', rarity:'Fabricado (raro)', importance:3,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab a partir de dos unidades de Graphene.',
+   process:'Chemistry Lab: 2 Graphene → 1 Diamond.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'graphene',qty:2}],
+   tips:'Al requerir 2 Graphene, es de los compuestos más caros de producir; resérvalo para objetos de investigación de alto valor.',
+   trivia:'Es el único compuesto cuya receta usa un solo ingrediente (aunque en cantidad doble).'},
+  {id:'hydrazine', name:'Hidrazina', en:'Hydrazine', type:'composite', color:'#ffb066', icon:'🚀', rarity:'Fabricado', importance:5,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab combinando Ammonium con Hydrogen.',
+   process:'Chemistry Lab: 2 Ammonium + 1 Hydrogen → 1 Hydrazine.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'ammonium',qty:2},{id:'hydrogen',qty:1}],
+   tips:'Combustible de cohetes, VTOL y mochilas propulsoras: mantén siempre unidades de reserva antes de despegar.',
+   trivia:'Es también uno de los ingredientes necesarios para fabricar Graphene, por lo que su demanda es doble.'},
+  {id:'silicone', name:'Silicona', en:'Silicone', type:'composite', color:'#e5e0d8', icon:'🧪', rarity:'Fabricado', importance:3,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab combinando tres ingredientes distintos.',
+   process:'Chemistry Lab: 1 Resin + 1 Quartz + 1 Methane → 1 Silicone.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'resin',qty:1},{id:'quartz',qty:1},{id:'methane',qty:1}],
+   tips:'Es el único compuesto con tres ingredientes distintos: prepárate para hacer más viajes de recolección.',
+   trivia:'Su icono recuerda a un tubo de gel, en referencia a las siliconas reales usadas como selladores.'},
+  {id:'explosive_powder', name:'Pólvora Explosiva', en:'Explosive Powder', type:'composite', color:'#7a2b25', icon:'🧨', rarity:'Fabricado', importance:3,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab a partir de Carbon y Sulfur.',
+   process:'Chemistry Lab: 2 Carbon + 1 Sulfur → 1 Explosive Powder.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'carbon',qty:2},{id:'sulfur',qty:1}],
+   tips:'Se usa para fabricar dinamita, útil para abrir grandes cavidades rápidamente en el terreno.',
+   trivia:'Visualmente aparece como una versión oscura y rojiza del Ammonium.'},
+  {id:'steel', name:'Acero', en:'Steel', type:'composite', color:'#8892a0', icon:'⚙️', rarity:'Fabricado', importance:5,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab combinando Carbon, Iron y Argon.',
+   process:'Chemistry Lab: 1 Carbon + 1 Iron + 1 Argon → 1 Steel.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'carbon',qty:1},{id:'iron',qty:1},{id:'argon',qty:1}],
+   tips:'Ingrediente clave del Nanocarbon Alloy: monta una base en Glacio para producirlo cerca de la fuente de Argón.',
+   trivia:'Es uno de los compuestos más solicitados para estructuras de almacenamiento de gran tamaño.'},
+  {id:'titanium_alloy', name:'Aleación de Titanio', en:'Titanium Alloy', type:'composite', color:'#b7bcc4', icon:'🛡️', rarity:'Fabricado', importance:5,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab combinando Titanium, Graphene y Nitrogen.',
+   process:'Chemistry Lab: 1 Titanium + 1 Graphene + 1 Nitrogen → 1 Titanium Alloy.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'titanium',qty:1},{id:'graphene',qty:1},{id:'nitrogen',qty:1}],
+   tips:'Uno de los compuestos con cadena de producción más larga; planifica varios viajes entre Glacio y Sylva.',
+   trivia:'Es el penúltimo eslabón antes de poder fabricar Nanocarbon Alloy, el material más avanzado del juego.'},
+  {id:'nanocarbon_alloy', name:'Aleación de Nanocarbono', en:'Nanocarbon Alloy', type:'composite', color:'#2e3238', icon:'🌌', rarity:'Fabricado (endgame)', importance:5,
+   found:[],
+   obtain:'Se sintetiza en el Chemistry Lab combinando Steel, Titanium Alloy y Helium: el compuesto más avanzado del juego.',
+   process:'Chemistry Lab: 1 Steel + 1 Titanium Alloy + 1 Helium → 1 Nanocarbon Alloy.',
+   centrifuge:false, furnace:false, lab:true,
+   recipe:[{id:'steel',qty:1},{id:'titanium_alloy',qty:1},{id:'helium',qty:1}],
+   tips:'Requiere visitar como mínimo Sylva o Vesania (Hidrógeno/Nitrógeno), Glacio (Hierro/Titanio/Argón) y Atrox (Helio). Planea bien la ruta.',
+   trivia:'El logro "Composite Perfection" se obtiene al refinar tu primera unidad de este material.'}
+];
+
+const RESOURCE_MAP = Object.fromEntries(RESOURCES.map(r=>[r.id,r]));
+
+/* ---------------- OBJETOS IMPRIMIBLES / PLATAFORMAS / ESTRUCTURAS ----------------
+   Los materiales de esta sección están anclados a dos fuentes cruzadas:
+   1) Las páginas oficiales de "Compound" y "Resin" de la wiki (listas reales de
+      "usado para fabricar"), que confirman en qué impresora y en qué objeto
+      participa cada recurso.
+   2) La guía de crafteo de la comunidad (Astroneer 0.10.2.0 "Crafting Update"),
+      usada como referencia de cantidades cuando la wiki actual no detalla el número.
+   Las cantidades pueden variar levemente entre parches: revisa la impresora
+   in-game si algo no cuadra exactamente con tu versión. */
+const OBJECTS = [
+  // ---- Mochila (Backpack Printer) — gratis, disponible desde el minuto uno ----
+  {id:'tether', name:'Amarre (Tether)', en:'Tether', cat:'soporte vital', printer:'Mochila',
+   materials:[{id:'compound',qty:1}], desc:'Cable que suministra oxígeno y energía desde la base o el traje a zonas alejadas.',
+   uses:'Herramienta esencial de exploración: marca tu camino y te mantiene con vida en cuevas.',
+   tips:'Colócalos en línea recta y no muy alejados entre sí para asegurar un flujo constante de oxígeno.'},
+  {id:'canister', name:'Contenedor (Canister)', en:'Canister', cat:'almacenamiento', printer:'Mochila',
+   materials:[{id:'resin',qty:1}], desc:'Pieza de terreno moldeable: crea paredes, rampas y puentes con la Herramienta de Terreno.',
+   uses:'Imprescindible para construir rampas de acceso a tu base y sellar cuevas.',
+   tips:'Lleva siempre 2-3 en tu mochila cuando explores: te sacan de apuros en terrenos imposibles.'},
+  {id:'oxygen_filter', name:'Filtro de Oxígeno', en:'Oxygen Filter', cat:'soporte vital', printer:'Mochila',
+   materials:[{id:'resin',qty:1}], desc:'Recarga instantánea de oxígeno para tu traje.',
+   uses:'Salvavidas de emergencia cuando te quedas sin tethers ni vehículo cerca.',
+   tips:'Lleva siempre uno de reserva en tu mochila antes de adentrarte en cuevas profundas.'},
+  {id:'beacon', name:'Baliza (Beacon)', en:'Beacon', cat:'exploración', printer:'Mochila',
+   materials:[{id:'quartz',qty:1}], desc:'Marca un punto en el mapa y el cielo para encontrarlo desde lejos.',
+   uses:'Marca bases secundarias, naufragios o yacimientos importantes en otros planetas.',
+   tips:'Cámbiale el color para diferenciar bases de recursos, de tránsito o de emergencia.'},
+  {id:'work_light', name:'Foco de Trabajo', en:'Work Light', cat:'utilidad', printer:'Mochila',
+   materials:[{id:'copper',qty:1}], desc:'Ilumina el área de trabajo, útil en cuevas oscuras o de noche.',
+   uses:'Acompaña casi cualquier base temprana para no quedarte a oscuras.',
+   tips:'Combínalo con un Small Generator para tener luz constante en tu primer campamento.'},
+  {id:'small_generator', name:'Generador Pequeño', en:'Small Generator', cat:'energía', printer:'Mochila',
+   materials:[{id:'compound',qty:1}], desc:'Quema Orgánico (o Carbono) para producir energía de forma constante.',
+   uses:'Fuente de energía fiable antes de tener paneles solares o eólicos suficientes.',
+   tips:'Guarda algo de Orgánico siempre a mano como "batería de emergencia" para la noche.'},
+  {id:'small_oxygen_tank', name:'Tanque de Oxígeno Pequeño', en:'Small Oxygen Tank', cat:'soporte vital', printer:'Mochila',
+   materials:[{id:'glass',qty:1}], desc:'Amplía la reserva de oxígeno del traje del astronauta.',
+   uses:'Fundamental para expediciones largas lejos de tethers o vehículos con oxígeno.',
+   tips:'Combínalo con tethers largos para no quedarte sin aire en cuevas profundas.'},
+  {id:'small_solar', name:'Panel Solar Pequeño', en:'Small Solar Panel', cat:'energía', printer:'Mochila',
+   materials:[{id:'copper',qty:1}], desc:'Genera energía durante el día; su rendimiento depende del ciclo solar del planeta.',
+   uses:'Ideal en Calidor y Sylva, donde el ciclo diurno es más largo y constante.',
+   tips:'En Glacio o Atrox, con ciclos día/noche largos y poca luz efectiva, complementa con baterías o eólicas.'},
+  {id:'small_wind', name:'Turbina Eólica Pequeña', en:'Small Wind Turbine', cat:'energía', printer:'Mochila',
+   materials:[{id:'glass',qty:1}], desc:'Genera energía a partir del viento; rendimiento variable según el planeta y la hora.',
+   uses:'Muy eficaz en Novus, con su ciclo día/noche corto, y en general como energía complementaria.',
+   tips:'Combínala con un panel solar para tener cobertura energética tanto de día como de noche.'},
+  {id:'power_cell', name:'Célula de Energía', en:'Power Cell', cat:'energía', printer:'Mochila',
+   materials:[{id:'zinc',qty:1}], desc:'Batería portátil de un solo uso que puedes llevar en cualquier ranura.',
+   uses:'Backup rápido de energía para tu traje o pequeños vehículos.',
+   tips:'Útil para expediciones cortas donde no quieres cargar con un generador completo.'},
+  {id:'small_battery', name:'Batería Pequeña', en:'Small Battery', cat:'energía', printer:'Mochila',
+   materials:[{id:'lithium',qty:1}], desc:'Almacena energía sobrante para usarla cuando la producción cae.',
+   uses:'Complementa paneles solares y turbinas en bases pequeñas.',
+   tips:'El Litio de Vesania es la mejor fuente para producir estas baterías en cadena.'},
+  {id:'dynamite', name:'Dinamita', en:'Dynamite', cat:'herramienta', printer:'Mochila',
+   materials:[{id:'explosive_powder',qty:1}], desc:'Explosivo que abre grandes cavidades en el terreno al instante.',
+   uses:'Muy útil para minería rápida o para despejar el camino de un vehículo atascado.',
+   tips:'Aléjate bien antes de detonarla: el radio de explosión es mayor de lo que parece.'},
+
+  // ---- Impresora Pequeña (Small Printer) ----
+  {id:'medium_storage', name:'Almacenamiento Mediano', en:'Medium Storage', cat:'almacenamiento', printer:'Impresora Pequeña',
+   materials:[{id:'resin',qty:2}], desc:'Módulo de almacenamiento con varias ranuras para nuggets sueltos.',
+   uses:'Reduce el desorden de tu base agrupando recursos en un solo módulo.',
+   tips:'Colócalo sobre un Large Platform B para que reciba automáticamente lo que sale de la Fundidora.'},
+  {id:'medium_platform_a', name:'Plataforma Mediana A', en:'Medium Platform A', cat:'estructura', printer:'Impresora Pequeña',
+   materials:[{id:'resin',qty:1}], desc:'Base modular para colocar módulos medianos como el Research Chamber o la Fundidora.',
+   uses:'El "suelo" sobre el que se construye la mayoría de bases pequeñas.',
+   tips:'Es de las piezas más baratas: no dudes en imprimir varias para expandirte rápido.'},
+  {id:'medium_platform_b', name:'Plataforma Mediana B', en:'Medium Platform B', cat:'estructura', printer:'Impresora Pequeña',
+   materials:[{id:'resin',qty:2}], desc:'Variante de plataforma mediana con ranuras laterales extra.',
+   uses:'Perfecta para colocar Almacenamiento Mediano a los lados mientras procesas recursos arriba.',
+   tips:'Combínala con la Fundidora encima y un Medium Storage a cada lado para una mini fábrica compacta.'},
+  {id:'medium_shredder', name:'Trituradora Mediana', en:'Medium Shredder', cat:'estructura', printer:'Impresora Pequeña',
+   materials:[{id:'iron',qty:2}], desc:'Recicla objetos pequeños y medianos en Scrap.',
+   uses:'Libera espacio e inventario recuperando parte del valor de objetos que ya no usas.',
+   tips:'Muy útil para deshacerte de duplicados de exploración sin perder todo su valor.'},
+  {id:'rover_seat', name:'Asiento de Rover', en:'Rover Seat', cat:'vehiculo', printer:'Impresora Pequeña',
+   materials:[{id:'compound',qty:2}], desc:'Asiento adicional para vehículos, permite llevar más de un astronauta.',
+   uses:'Convierte cualquier rover en transporte de varios pasajeros.',
+   tips:'Muy barato de fabricar: lleva siempre uno de repuesto en el inventario.'},
+  {id:'medium_generator', name:'Generador Mediano', en:'Medium Generator', cat:'energía', printer:'Impresora Pequeña',
+   materials:[{id:'tungsten',qty:1},{id:'aluminum',qty:1}], desc:'Genera más energía que el Small Generator quemando Carbono u Orgánico.',
+   uses:'Ideal para bases medianas con varias impresoras y estructuras activas a la vez.',
+   tips:'Usa Carbono en vez de Orgánico: rinde mucha más energía por nugget.'},
+  {id:'medium_solar', name:'Panel Solar Mediano', en:'Medium Solar Panel', cat:'energía', printer:'Impresora Pequeña',
+   materials:[{id:'glass',qty:1},{id:'copper',qty:1}], desc:'Versión de mayor capacidad del panel solar, ideal para bases fijas.',
+   uses:'Cubre el consumo de estructuras como la Fundidora o el Chemistry Lab durante el día.',
+   tips:'Combínalo con una Batería Mediana para no perder producción durante la noche.'},
+  {id:'medium_wind', name:'Turbina Eólica Mediana', en:'Medium Wind Turbine', cat:'energía', printer:'Impresora Pequeña',
+   materials:[{id:'ceramic',qty:1},{id:'glass',qty:1}], desc:'Versión de mayor capacidad de la turbina eólica.',
+   uses:'Muy eficaz en planetas ventosos o de ciclo día/noche corto como Novus.',
+   tips:'Colócala en zonas elevadas para captar más viento.'},
+  {id:'medium_battery', name:'Batería Mediana', en:'Medium Battery', cat:'energía', printer:'Impresora Pequeña',
+   materials:[{id:'zinc',qty:1},{id:'lithium',qty:1}], desc:'Almacena energía sobrante para usarla cuando la producción cae (de noche o sin viento).',
+   uses:'Evita que tu base se quede sin energía en los "valles" de producción solar o eólica.',
+   tips:'En planetas de ciclo largo como Glacio, necesitarás varias baterías conectadas en cadena.'},
+  {id:'winch', name:'Cabrestante (Winch)', en:'Winch', cat:'utilidad', printer:'Impresora Pequeña',
+   materials:[{id:'rubber',qty:1},{id:'tungsten',qty:1}], desc:'Cable de remolque que engancha vehículos o carga suelta.',
+   uses:'Salva vehículos volcados o atascados en pendientes pronunciadas.',
+   tips:'Llévalo en cualquier rover de exploración: te ahorra caminatas largas de rescate.'},
+  {id:'splitter', name:'Divisor (Splitter)', en:'Splitter', cat:'utilidad', printer:'Impresora Pequeña',
+   materials:[{id:'graphite',qty:1},{id:'copper',qty:1}], desc:'Divide una única ranura de conexión en varias salidas.',
+   uses:'Permite conectar más módulos de energía o de automatización sin ranuras libres.',
+   tips:'Muy útil en bases compactas donde te falten puertos de conexión.'},
+  {id:'drill_head', name:'Cabezal de Perforación', en:'Drill Head', cat:'vehiculo', printer:'Impresora Pequeña',
+   materials:[{id:'ceramic',qty:1},{id:'tungsten_carbide',qty:1}], desc:'Se instala en vehículos para perforar terreno automáticamente al conducir.',
+   uses:'Excavación rápida de túneles y rampas sin usar la Herramienta de Terreno a mano.',
+   tips:'Combínalo con un Auto Extractor cercano para automatizar toda una operación minera.'},
+  {id:'solid_fuel_thruster', name:'Propulsor de Combustible Sólido', en:'Solid-Fuel Thruster', cat:'vehiculo', printer:'Impresora Pequeña',
+   materials:[{id:'ammonium',qty:1},{id:'aluminum',qty:1}], desc:'Motor básico de cohete para el primer vuelo interplanetario.',
+   uses:'Imprescindible para tu primer despegue: sin él no puedes salir de Sylva.',
+   tips:'Lleva siempre uno de repuesto guardado en la mochila para el viaje de vuelta.'},
+  {id:'hydrazine_thruster', name:'Propulsor de Hidrazina', en:'Hydrazine Thruster', cat:'vehiculo', printer:'Impresora Pequeña',
+   materials:[{id:'titanium_alloy',qty:1},{id:'tungsten',qty:1}], desc:'Motor de cohete avanzado, más eficiente que el de combustible sólido.',
+   uses:'Vuelos interplanetarios más rápidos y con mayor capacidad de carga.',
+   tips:'Requiere Hidrazina como combustible: asegura una buena producción antes de depender de él.'},
+  {id:'tractor', name:'Tractor', en:'Tractor', cat:'vehiculo', printer:'Impresora Pequeña',
+   materials:[{id:'aluminum',qty:2}], desc:'Rover pequeño de bajo coste, ágil en terreno irregular.',
+   uses:'Ideal para exploración rápida cerca de la base antes de tener vehículos más grandes.',
+   tips:'Súbele un Small Generator o Small Wind Turbine si vas a alejarte mucho de tu base.'},
+  {id:'trailer', name:'Remolque', en:'Trailer', cat:'remolque', printer:'Impresora Pequeña',
+   materials:[{id:'aluminum',qty:1}], desc:'Remolque enganchable con ranuras extra de almacenamiento.',
+   uses:'Amplía la capacidad de carga de cualquier rover en tus expediciones.',
+   tips:'Combínalo con un Auto Arm en la base para descargar automáticamente al llegar.'},
+
+  // ---- Impresora Mediana (Medium Printer) ----
+  {id:'large_platform_a', name:'Plataforma Grande A', en:'Large Platform A', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'resin',qty:2}], desc:'Base modular de mayor tamaño para estructuras medianas y grandes.',
+   uses:'Soporte típico para el Research Chamber, la Fundidora o el Chemistry Lab.',
+   tips:'Déjala fija cerca de tu Vehicle Bay para que sea el corazón de tu base principal.'},
+  {id:'large_platform_b', name:'Plataforma Grande B', en:'Large Platform B', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'resin',qty:3}], desc:'Variante con dos ranuras laterales, ideales para almacenamiento auxiliar.',
+   uses:'Muy usada para crear estaciones de refinado con almacenamiento incorporado a los lados.',
+   tips:'Coloca un Medium Storage en cada ranura lateral para que la Fundidora se autoalimente.'},
+  {id:'large_platform_c', name:'Plataforma Grande C', en:'Large Platform C', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'iron',qty:3}], desc:'Variante reforzada de plataforma grande, pensada para estructuras pesadas.',
+   uses:'Base sólida para instalaciones de automatización o líneas de producción avanzadas.',
+   tips:'Resérvala para tu base principal, ya que su coste en Hierro es más alto que las otras plataformas.'},
+  {id:'research_chamber', name:'Cámara de Investigación', en:'Research Chamber', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'resin',qty:1},{id:'compound',qty:2}], desc:'Convierte recursos y objetos de investigación en Bytes, la moneda de investigación del juego.',
+   uses:'Desbloquea nuevas recetas e impresoras a medida que gastas Bytes en el árbol tecnológico.',
+   tips:'Investigar objetos de exploración (samples, cápsulas) da muchos más bytes que investigar recursos crudos.'},
+  {id:'smelting_furnace', name:'Fundidora', en:'Smelting Furnace', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'resin',qty:2},{id:'compound',qty:1}], desc:'Refina recursos naturales en recursos refinados (p. ej. Laterita en Aluminio).',
+   uses:'Imprescindible desde el inicio: sin ella no se puede acceder a casi ningún metal refinado.',
+   tips:'Colócala junto a un contenedor de recursos naturales para automatizar el refinado con Auto Arm más adelante.'},
+  {id:'soil_centrifuge', name:'Centrifugadora de Tierra', en:'Soil Centrifuge', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'aluminum',qty:1},{id:'compound',qty:2}], desc:'Separa la Tierra (Soil) recogida al excavar en Compound, Resin, Organic, Clay, Quartz y Graphite.',
+   uses:'Reduce muchísimo la necesidad de "farmear" Compound y Resin a mano.',
+   tips:'Conéctala a un Auto Arm y un Medium Storage para reciclar automáticamente toda la tierra que generes al excavar.'},
+  {id:'chemistry_lab', name:'Laboratorio Químico', en:'Chemistry Lab', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'tungsten',qty:1},{id:'glass',qty:1},{id:'ceramic',qty:1}], desc:'Combina pares (o tríos) de recursos, a veces con un gas, para crear recursos compuestos.',
+   uses:'Puerta de entrada a Rubber, Plastic, Hydrazine, Steel y el resto de compuestos avanzados.',
+   tips:'Desbloquearlo cuesta 1600 Bytes en el Research Chamber; úsalo una vez para el logro "Lab Rat".'},
+  {id:'atmospheric_condenser', name:'Condensador Atmosférico', en:'Atmospheric Condenser', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'iron',qty:1},{id:'glass',qty:1},{id:'plastic',qty:1}], desc:'Condensa la atmósfera del planeta en gases utilizables en la Chemistry Lab.',
+   uses:'Necesario para obtener cualquier gas: Hydrogen, Nitrogen, Methane, Argon, Sulfur o Helium.',
+   tips:'Colócalo en zonas altas para mayor eficiencia y conéctalo a contenedores de gas vacíos.'},
+  {id:'trade_platform', name:'Plataforma de Comercio', en:'Trade Platform', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'compound',qty:1},{id:'tungsten',qty:1},{id:'iron',qty:1}], desc:'Intercambia recursos por Scrap, y Scrap por otros recursos, a distintas tasas.',
+   uses:'Ideal para conseguir de urgencia el recurso que te falte, o para deshacerte de excedentes.',
+   tips:'Astronio da la mejor tasa de conversión a Scrap: consérvalo para emergencias de fabricación.'},
+  {id:'large_shredder', name:'Trituradora Grande', en:'Large Shredder', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'iron',qty:2},{id:'tungsten_carbide',qty:1}], desc:'Versión más grande de la trituradora, capaz de reciclar vehículos y estructuras completas.',
+   uses:'Perfecta para deshacerte de rovers o remolques que ya no necesites.',
+   tips:'Colócala cerca del garaje: reciclar vehículos viejos ayuda mucho a conseguir Scrap para el Trade Platform.'},
+  {id:'exo_request', name:'Plataforma de Solicitud EXO', en:'EXO Request Platform', cat:'estructura', printer:'Impresora Mediana',
+   materials:[{id:'plastic',qty:1}], desc:'Permite solicitar misiones y recompensas de la organización EXO a cambio de recursos.',
+   uses:'Fuente adicional de Bytes y objetos únicos completando misiones.',
+   tips:'Revisa las misiones activas regularmente: algunas piden materiales que ya tienes de sobra.'},
+  {id:'auto_arm', name:'Brazo Automático', en:'Auto Arm', cat:'automatización', printer:'Impresora Mediana',
+   materials:[{id:'aluminum_alloy',qty:1}], desc:'Mueve automáticamente objetos Tier 1 entre dos ranuras cercanas.',
+   uses:'Automatiza el trasvase de nuggets entre Fundidora, Chemistry Lab y contenedores.',
+   tips:'Funciona muy bien colocado entre dos Silos Medianos o Grandes para crear una cadena de producción continua.'},
+  {id:'buggy', name:'Buggy', en:'Buggy', cat:'vehiculo', printer:'Impresora Mediana',
+   materials:[{id:'aluminum',qty:1},{id:'compound',qty:1}], desc:'Vehículo ligero de un asiento, rápido y con buena maniobrabilidad.',
+   uses:'Un salto de calidad respecto al Tractor para desplazarte por la base y alrededores.',
+   tips:'Añádele un Rover Seat si vas a llevar a otro astronauta contigo.'},
+  {id:'medium_rover', name:'Rover Mediano', en:'Medium Rover', cat:'vehiculo', printer:'Impresora Mediana',
+   materials:[{id:'ceramic',qty:1},{id:'aluminum',qty:2}], desc:'Rover de tamaño medio con más ranuras y mejor tracción que el Buggy.',
+   uses:'Buen equilibrio entre velocidad y capacidad de carga para expediciones medias.',
+   tips:'Puedes engancharle remolques pequeños para transportar más recursos en tus rutas.'},
+
+  // ---- Impresora Grande (Large Printer) ----
+  {id:'extra_large_platform_a', name:'Plataforma Extra Grande A', en:'Extra-Large Platform A', cat:'estructura', printer:'Impresora Grande',
+   materials:[{id:'iron',qty:4}], desc:'La mayor base modular del juego, pensada para instalaciones industriales.',
+   uses:'Soporte de proyectos a gran escala: líneas de producción completas o zonas de lanzamiento.',
+   tips:'Resérvala para tu base principal: su coste en Hierro es considerable.'},
+  {id:'extra_large_platform_b', name:'Plataforma Extra Grande B', en:'Extra-Large Platform B', cat:'estructura', printer:'Impresora Grande',
+   materials:[{id:'resin',qty:2},{id:'iron',qty:2}], desc:'Variante de la plataforma extra grande con ranuras adicionales.',
+   uses:'Ideal para bases avanzadas con múltiples silos y estructuras de automatización.',
+   tips:'Combínala con Extra Large Storage para tener las mayores reservas de recursos del juego.'},
+  {id:'large_storage', name:'Almacenamiento Grande', en:'Large Storage', cat:'almacenamiento', printer:'Impresora Grande',
+   materials:[{id:'ceramic',qty:3}], desc:'Módulo de almacenamiento de mayor capacidad que el Medium Storage.',
+   uses:'Ideal para acopiar grandes cantidades de un recurso antes de un proyecto grande (como un cohete).',
+   tips:'Colócalo cerca de tu Fundidora o Chemistry Lab para minimizar el transporte manual.'},
+  {id:'extra_large_storage', name:'Almacenamiento Extra Grande', en:'Extra-Large Storage', cat:'almacenamiento', printer:'Impresora Grande',
+   materials:[{id:'iron',qty:2},{id:'steel',qty:2}], desc:'El mayor módulo de almacenamiento disponible, con numerosas ranuras.',
+   uses:'Reserva masiva de recursos para bases de producción industrial o proyectos endgame.',
+   tips:'Apóyalo contra una pared para poder acceder a todas sus caras cómodamente.'},
+  {id:'large_rover', name:'Rover Grande', en:'Large Rover', cat:'vehiculo', printer:'Impresora Grande',
+   materials:[{id:'rubber',qty:2},{id:'aluminum_alloy',qty:2}], desc:'Vehículo de varios asientos con múltiples ranuras Tier 2/3, capaz de llevar remolques largos.',
+   uses:'Un cambio radical en logística de mediados de partida: transporta impresoras y estructuras enteras.',
+   tips:'Puedes montarle una impresora mediana encima para fabricar objetos mientras viajas.'},
+  {id:'crane', name:'Grúa (Crane)', en:'Crane', cat:'utilidad', printer:'Impresora Grande',
+   materials:[{id:'titanium',qty:1},{id:'silicone',qty:1},{id:'steel',qty:1}], desc:'Brazo mecánico que levanta y mueve objetos y vehículos pesados.',
+   uses:'Perfecta para cargar remolques, rovers o estructuras completas de un lado a otro.',
+   tips:'Muy útil en bases industriales donde mover objetos a mano ya no es práctico.'},
+  {id:'habitat', name:'Hábitat', en:'Habitat', cat:'estructura', printer:'Inicial (no se imprime)',
+   materials:[], desc:'Estructura inicial de aterrizaje: tu primera fuente de energía (RTG integrado) y punto de generación de vehículos.',
+   uses:'Punto de partida de toda base; contiene el primer Small Printer y un RTG permanente.',
+   tips:'No puede reciclarse ni moverse: planifica tu base alrededor de su ubicación inicial.'}
+];
+const OBJECT_MAP = Object.fromEntries(OBJECTS.map(o=>[o.id,o]));
+
+/* ---------------- VEHÍCULOS ----------------
+   Nota: Tractor, Buggy, Medium Rover, Large Rover y Trailer ya están en OBJECTS
+   (organizados por impresora); aquí van los vehículos que no encajan en esa lista. */
+const VEHICLES = [
+  {id:'fluid_trailer', name:'Remolque de Fluidos', en:'Fluid Trailer', cat:'remolque', printer:'Impresora Mediana',
+   materials:[{id:'aluminum_alloy',qty:1}], desc:'Remolque especializado en transportar contenedores de gas.',
+   uses:'Imprescindible para traer gases (Helio, Argón...) desde planetas lejanos a tu base principal.',
+   tips:'Llévalo siempre vacío hacia Atrox o Glacio y vuelve cargado de gas.'},
+  {id:'hoverboard', name:'Patineta Voladora', en:'Hoverboard', cat:'vehiculo', printer:'Impresora Mediana',
+   materials:[{id:'titanium_alloy',qty:1}], desc:'Vehículo individual que se desliza sobre el terreno sin necesidad de ruedas.',
+   uses:'Excelente para moverse rápido sobre terreno muy irregular o cuevas estrechas.',
+   tips:'Consume energía de tu traje: lleva baterías o un RTG portátil si la vas a usar mucho tiempo.'},
+  {id:'small_shuttle', name:'Lanzadera Pequeña', en:'Small Shuttle', cat:'vehiculo', printer:'Impresora Grande',
+   materials:[{id:'aluminum',qty:2}], desc:'Tu primer vehículo espacial: te lleva a la órbita y a otros planetas.',
+   uses:'Imprescindible para dejar Sylva por primera vez y empezar a explorar el sistema.',
+   tips:'Móntale un Solid-Fuel Thruster antes de despegar, y lleva otro de repuesto en la mochila.'},
+  {id:'medium_shuttle', name:'Lanzadera Mediana', en:'Medium Shuttle', cat:'vehiculo', printer:'Impresora Grande',
+   materials:[{id:'ceramic',qty:2},{id:'aluminum_alloy',qty:1}], desc:'Cohete de mayor capacidad, con más ranuras de carga que la lanzadera pequeña.',
+   uses:'Permite llevar vehículos pequeños o varios silos de recursos entre planetas.',
+   tips:'Buen momento para actualizar cuando ya dependas de traer Copper o Tungsten de otro planeta.'},
+  {id:'large_shuttle', name:'Lanzadera Grande', en:'Large Shuttle', cat:'vehiculo', printer:'Impresora Grande',
+   materials:[{id:'ceramic',qty:2},{id:'titanium_alloy',qty:2}], desc:'El cohete de mayor capacidad, capaz de transportar rovers medianos completos.',
+   uses:'Clave para trasladar un Rover Grande o un Tren completo a otro planeta.',
+   tips:'Vuela con Hydrazine Thrusters para maximizar la carga útil en cada viaje.'},
+  {id:'vtol', name:'VTOL', en:'VTOL', cat:'vehiculo', printer:'Impresora Grande',
+   materials:[{id:'titanium_alloy',qty:2},{id:'hydrazine',qty:2}], desc:'Vehículo de despegue vertical que vuela usando Hidrazina como combustible.',
+   uses:'Perfecto para cruzar terrenos imposibles de atravesar en rover, como cañones o montañas.',
+   tips:'Lleva siempre Hidrazina de sobra: sin combustible se queda varado en pleno vuelo.'}
+];
+const VEHICLE_MAP = Object.fromEntries(VEHICLES.map(v=>[v.id,v]));
+
+/* ---------------- FERROCARRIL ---------------- */
+const TRAINS = [
+  {id:'train_engine', name:'Locomotora', en:'Train Engine', cat:'tren', printer:'Impresora Grande',
+   materials:[{id:'titanium_alloy',qty:1}], desc:'Motor del tren; se desplaza sobre raíles previamente construidos con la Herramienta de Terreno.',
+   uses:'Transporte masivo y automatizable de recursos entre bases lejanas del mismo planeta.',
+   tips:'Combínala con Auto Arms en cada estación para cargar y descargar sin intervención manual.'},
+  {id:'train_storage_car', name:'Vagón de Almacenamiento', en:'Storage Silo Car', cat:'tren', printer:'Impresora Grande',
+   materials:[{id:'aluminum_alloy',qty:1}], desc:'Vagón con ranuras de almacenamiento para transportar recursos sólidos.',
+   uses:'La forma más eficiente de mover grandes cantidades de un recurso entre dos puntos fijos.',
+   tips:'Usa varios vagones en fila para maximizar la carga de cada viaje.'},
+  {id:'train_fluid_car', name:'Vagón de Fluidos', en:'Fluid Canister Car', cat:'tren', printer:'Impresora Grande',
+   materials:[{id:'aluminum_alloy',qty:1}], desc:'Vagón especializado en transportar contenedores de gas.',
+   uses:'Ideal para traer gases desde una zona de recolección remota hasta tu base de Chemistry Lab.',
+   tips:'Combínalo con un Condensador Atmosférico automatizado en el punto de partida.'},
+  {id:'train_xl_car', name:'Vagón Extra Grande', en:'Extra-Large Storage Car', cat:'tren', printer:'Impresora Grande',
+   materials:[{id:'aluminum_alloy',qty:2}], desc:'Versión de mayor capacidad del vagón de almacenamiento, para cargas masivas.',
+   uses:'Perfecto para proyectos de construcción a gran escala que requieren toneladas de un mismo material.',
+   tips:'Reserva estos vagones para tus rutas de mayor tráfico, ya que consumen más energía por tramo.'},
+  {id:'train_seat', name:'Asiento de Tren', en:'Train Seat', cat:'tren', printer:'Impresora Mediana',
+   materials:[{id:'plastic',qty:1}], desc:'Permite a un astronauta viajar sentado en la locomotora o un vagón.',
+   uses:'Convierte el tren en transporte de pasajeros además de mercancías.',
+   tips:'Útil para desplazarte tú mismo entre bases sin gastar combustible de rover.'}
+];
+const TRAIN_MAP = Object.fromEntries(TRAINS.map(t=>[t.id,t]));
+
+/* ---------------- AUTOMATIZACIÓN ---------------- */
+const AUTOMATION = [
+  {id:'auto_arm_a', name:'Brazo Automático', en:'Auto Arm', cat:'automatizacion', printer:'Impresora Mediana',
+   materials:[{id:'aluminum_alloy',qty:1}], desc:'Transfiere objetos Tier 1 automáticamente entre dos ranuras adyacentes.',
+   uses:'La pieza más básica y versátil de cualquier línea de producción automatizada.',
+   tips:'Puedes encadenar varios Auto Arms para mover recursos a lo largo de toda tu base.'},
+  {id:'auto_extractor_a', name:'Extractor Automático', en:'Auto Extractor (Large)', cat:'automatizacion', printer:'Impresora Grande',
+   materials:[{id:'aluminum_alloy',qty:2}], desc:'Extrae recursos de un depósito de forma continua sin destruir el terreno.',
+   uses:'Base de cualquier granja de recursos automatizada.',
+   tips:'Combínalo con un Silo y un Auto Arm para una mina 100% autónoma.'},
+  {id:'switch_activated', name:'Interruptor Activado', en:'Switch Activated Platform', cat:'automatizacion', printer:'Impresora Mediana',
+   materials:[{id:'plastic',qty:1}], desc:'Activa o desactiva un módulo conectado según el estado de un interruptor.',
+   uses:'Controla generadores, luces o extractores de forma manual o remota.',
+   tips:'Combínalo con sensores para crear sistemas que se activan solos ante ciertas condiciones.'},
+  {id:'sensor_motion', name:'Sensor de Movimiento', en:'Motion Sensor', cat:'automatizacion', printer:'Impresora Mediana',
+   materials:[{id:'plastic',qty:1}], desc:'Detecta movimiento cercano y envía una señal a los módulos conectados.',
+   uses:'Ideal para trampas, luces automáticas o alertas de proximidad.',
+   tips:'Colócalo en la entrada de tu base para activar luces solo cuando alguien se acerque.'},
+  {id:'sensor_power', name:'Sensor de Energía', en:'Power Sensor', cat:'automatizacion', printer:'Impresora Mediana',
+   materials:[{id:'plastic',qty:1}], desc:'Detecta el nivel de energía de la red y activa o desactiva módulos según un umbral.',
+   uses:'Permite encender generadores de respaldo solo cuando la batería baja de cierto nivel.',
+   tips:'Combínalo con un Small Generator para tener energía de emergencia totalmente automática.'}
+];
+const AUTOMATION_MAP = Object.fromEntries(AUTOMATION.map(a=>[a.id,a]));
+
+/* Todos los "items fabricables" (objetos+vehículos+trenes+automatización) en un solo mapa,
+   útil para calcular en qué construcciones participa cada recurso. */
+const ALL_ITEMS = [...OBJECTS, ...VEHICLES, ...TRAINS, ...AUTOMATION];
+
+/* ============================================================
+   ESTADO DE LA APLICACIÓN
+   ============================================================ */
+let currentSection = 'inicio';
+let favorites = new Set(JSON.parse(localStorage.getItem('astropedia_favs') || '[]'));
+
+function saveFavs(){
+  localStorage.setItem('astropedia_favs', JSON.stringify([...favorites]));
+}
+function toggleFav(id, ev){
+  if(ev) ev.stopPropagation();
+  if(favorites.has(id)){ favorites.delete(id); showToast('Eliminado de favoritos'); }
+  else { favorites.add(id); showToast('Añadido a favoritos ⭐'); }
+  saveFavs();
+  render();
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ============================================================
+   MENÚ LATERAL
+   ============================================================ */
+const MENU = [
+  {id:'inicio', label:'Inicio', icon:'🏠'},
+  {id:'naturales', label:'Recursos naturales', icon:'🌿'},
+  {id:'refinados', label:'Recursos refinados', icon:'🔥'},
+  {id:'compuestos', label:'Recursos compuestos', icon:'⚗️'},
+  {id:'gases', label:'Gases', icon:'☁️'},
+  {id:'quimica', label:'Laboratorio de química', icon:'🧪'},
+  {id:'objetos', label:'Objetos imprimibles', icon:'📦'},
+  {id:'vehiculos', label:'Vehículos', icon:'🚜'},
+  {id:'ferrocarril', label:'Ferrocarril', icon:'🚂'},
+  {id:'automatizacion', label:'Automatización', icon:'🤖'},
+  {id:'favoritos', label:'Favoritos', icon:'⭐'},
+  {id:'planetas', label:'Planetas', icon:'🌍'},
+  {id:'tecnologia', label:'Árbol tecnológico', icon:'📚'}
+];
+
+function countFor(id){
+  switch(id){
+    case 'naturales': return RESOURCES.filter(r=>r.type==='natural').length;
+    case 'refinados': return RESOURCES.filter(r=>r.type==='refined').length;
+    case 'compuestos': return RESOURCES.filter(r=>r.type==='composite').length;
+    case 'gases': return RESOURCES.filter(r=>r.type==='gas').length;
+    case 'quimica': return RESOURCES.filter(r=>r.type==='composite').length;
+    case 'objetos': return OBJECTS.length;
+    case 'vehiculos': return VEHICLES.length;
+    case 'ferrocarril': return TRAINS.length;
+    case 'automatizacion': return AUTOMATION.length;
+    case 'favoritos': return favorites.size;
+    case 'planetas': return PLANETS.length;
+    default: return null;
+  }
+}
+
+function buildMenu(){
+  const el = document.getElementById('menu');
+  el.innerHTML = MENU.map(m=>{
+    const c = countFor(m.id);
+    const activeCls = currentSection===m.id ? 'active' : '';
+    return `<div class="menu-item ${activeCls}" onclick="navigate('${m.id}')">
+      <span class="ic">${m.icon}</span><span>${m.label}</span>
+      ${c!==null ? `<span class="count">${c}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function navigate(section){
+  currentSection = section;
+  window.scrollTo({top:0,behavior:'instant' in window ? 'instant':'auto'});
+  closeSidebar();
+  render();
+}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebar-scrim').classList.add('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-scrim').classList.remove('show');}
+
+/* ============================================================
+   RENDER: helpers comunes
+   ============================================================ */
+function starRating(n){
+  n = Math.max(1,Math.min(5, n||1));
+  return '★'.repeat(n) + '☆'.repeat(5-n);
+}
+function iconCircle(color, icon, size){
+  return `<div class="res-icon" style="width:${size||42}px;height:${size||42}px;background:linear-gradient(150deg, ${color}33, ${color}14); color:${color}; box-shadow:inset 0 0 0 1px ${color}44;">${icon}</div>`;
+}
+function typeLabel(t){
+  return {natural:'Natural', refined:'Refinado', gas:'Gas', composite:'Compuesto'}[t] || t;
+}
+function planetName(id){ return PLANET_MAP[id] ? PLANET_MAP[id].name : id; }
+
+function resourceCard(r){
+  const fav = favorites.has(r.id);
+  return `<div class="res-card" onclick="openResource('${r.id}')">
+    <div class="top-row">
+      ${iconCircle(r.color, r.icon)}
+      <div style="min-width:0;">
+        <div class="rc-name">${r.name}</div>
+        <div class="rc-en">${r.en}</div>
+      </div>
+      <button class="fav-btn ${fav?'active':''}" onclick="toggleFav('${r.id}', event)">${fav?'★':'☆'}</button>
+    </div>
+    <div class="rc-tags">
+      <span class="tag">${typeLabel(r.type)}</span>
+      <span class="tag">${r.rarity}</span>
+    </div>
+    <div class="stars">${starRating(r.importance)}</div>
+    <div class="rc-desc">${truncate(r.obtain, 100)}</div>
+  </div>`;
+}
+
+function itemCard(it){
+  const fav = favorites.has(it.id);
+  return `<div class="res-card" onclick="openItem('${it.id}')">
+    <div class="top-row">
+      ${iconCircle('#ffb066','📦')}
+      <div style="min-width:0;">
+        <div class="rc-name">${it.name}</div>
+        <div class="rc-en">${it.en}</div>
+      </div>
+      <button class="fav-btn ${fav?'active':''}" onclick="toggleFav('${it.id}', event)">${fav?'★':'☆'}</button>
+    </div>
+    <div class="rc-tags"><span class="tag">${it.printer}</span></div>
+    <div class="rc-desc">${truncate(it.desc,100)}</div>
+  </div>`;
+}
+
+function truncate(s,n){ if(!s) return ''; return s.length>n ? s.slice(0,n-1)+'…' : s; }
+
+/* ============================================================
+   RENDER: secciones principales
+   ============================================================ */
+function render(){
+  buildMenu();
+  const c = document.getElementById('content');
+  switch(currentSection){
+    case 'inicio': c.innerHTML = renderHome(); break;
+    case 'naturales': c.innerHTML = renderResourceList('natural','🌿 Recursos naturales','Materiales que se extraen directamente del terreno con la Herramienta de Terreno o la Centrifugadora de Tierra.'); break;
+    case 'refinados': c.innerHTML = renderResourceList('refined','🔥 Recursos refinados','Se obtienen fundiendo recursos naturales en la Fundidora (Smelting Furnace).'); break;
+    case 'compuestos': c.innerHTML = renderResourceList('composite','⚗️ Recursos compuestos','Se sintetizan en el Laboratorio Químico combinando dos o más recursos, a veces con un gas.'); break;
+    case 'gases': c.innerHTML = renderResourceList('gas','☁️ Gases','Recursos atmosféricos recolectados con el Condensador Atmosférico; su disponibilidad varía por planeta.'); break;
+    case 'quimica': c.innerHTML = renderChemistry(); break;
+    case 'objetos': c.innerHTML = renderItemList(OBJECTS,'📦 Objetos imprimibles','Estructuras y objetos que se fabrican en las impresoras, con sus materiales y utilidad.'); break;
+    case 'vehiculos': c.innerHTML = renderItemList(VEHICLES,'🚜 Vehículos','Rovers, remolques y vehículos aéreos para explorar y transportar recursos.'); break;
+    case 'ferrocarril': c.innerHTML = renderItemList(TRAINS,'🚂 Ferrocarril','El sistema de trenes permite transporte masivo y automatizado sobre raíles.'); break;
+    case 'automatizacion': c.innerHTML = renderItemList(AUTOMATION,'🤖 Automatización','Brazos, extractores y sensores para que tu base funcione sola.'); break;
+    case 'favoritos': c.innerHTML = renderFavorites(); break;
+    case 'planetas': c.innerHTML = renderPlanets(); break;
+    case 'tecnologia': c.innerHTML = renderTechTree(); break;
+    default: c.innerHTML = renderHome();
+  }
+}
+
+function renderHome(){
+  const stats = [
+    {n: RESOURCES.filter(r=>r.type==='natural').length, l:'Recursos naturales'},
+    {n: RESOURCES.filter(r=>r.type==='refined').length, l:'Recursos refinados'},
+    {n: RESOURCES.filter(r=>r.type==='composite').length, l:'Compuestos'},
+    {n: RESOURCES.filter(r=>r.type==='gas').length, l:'Gases'},
+    {n: OBJECTS.length, l:'Objetos / plataformas'},
+    {n: VEHICLES.length + TRAINS.length, l:'Vehículos y trenes'},
+    {n: AUTOMATION.length, l:'Piezas de automatización'},
+    {n: RESOURCES.filter(r=>r.recipe && r.recipe.length).length, l:'Recetas registradas'},
+  ];
+  return `
+    <div class="section-head">
+      <div class="section-eyebrow">Astropedia · v1.0</div>
+      <div class="section-title">Enciclopedia offline de Astroneer</div>
+      <div class="section-desc">Toda la información sobre recursos, química, objetos, vehículos y planetas del juego, contrastada con la wiki oficial. Usa el buscador de arriba o el menú lateral para navegar. Todo funciona sin conexión a internet.</div>
+    </div>
+    <div class="stat-grid">
+      ${stats.map(s=>`<div class="stat-card"><div class="glow"></div><div class="num">${s.n}</div><div class="lbl">${s.l}</div></div>`).join('')}
+    </div>
+    <div class="home-grid">
+      <div class="panel">
+        <h3>⭐ Recursos más importantes</h3>
+        <div class="mini-list">
+          ${RESOURCES.filter(r=>r.importance>=5).slice(0,8).map(r=>`
+            <div class="mini-row" onclick="openResource('${r.id}')">
+              ${iconCircle(r.color,r.icon,30)}
+              <span class="mi-name">${r.name}</span>
+              <span class="mi-sub">${typeLabel(r.type)}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="panel">
+        <h3>🌍 Planetas</h3>
+        <div class="planet-strip">
+          ${PLANETS.map(p=>`<div class="planet-chip" onclick="openPlanet('${p.id}')">${p.icon ? `<img src="${p.icon}" alt="${p.name}" style="width:24px;height:24px;object-fit:contain;">` : ''}<span>${p.name}</span></div>`).join('')}
+        </div>
+        <h3 style="margin-top:20px;">🧪 Empezar por la química</h3>
+        <div class="mini-list">
+          ${RESOURCES.filter(r=>r.type==='composite').slice(0,5).map(r=>`
+            <div class="mini-row" onclick="openResource('${r.id}')">
+              ${iconCircle(r.color,r.icon,30)}
+              <span class="mi-name">${r.name}</span>
+              <span class="mi-sub">Ver receta →</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderResourceList(type, title, desc){
+  const list = RESOURCES.filter(r=>r.type===type);
+  return `
+    <div class="section-head">
+      <div class="section-title">${title}</div>
+      <div class="section-desc">${desc}</div>
+    </div>
+    <div class="card-grid">${list.map(resourceCard).join('')}</div>
+  `;
+}
+
+function renderChemistry(){
+  const list = RESOURCES.filter(r=>r.type==='composite');
+  return `
+    <div class="section-head">
+      <div class="section-title">🧪 Laboratorio de Química</div>
+      <div class="section-desc">El Chemistry Lab combina dos (o tres) recursos —a veces con un gas de por medio— para crear los materiales más avanzados del juego. Pulsa cualquier compuesto para ver su árbol de fabricación completo.</div>
+    </div>
+    <div class="card-grid">
+      ${list.map(r=>`
+        <div class="res-card" onclick="openResource('${r.id}')">
+          <div class="top-row">
+            ${iconCircle(r.color,r.icon)}
+            <div><div class="rc-name">${r.name}</div><div class="rc-en">${r.en}</div></div>
+          </div>
+          <div class="rc-desc">${r.process}</div>
+          <div class="pill-row">
+            ${r.recipe.map(ing=>`<span class="pill">${iconInline(ing.id)} <span class="qty">${ing.qty}×</span> ${RESOURCE_MAP[ing.id].name}</span>`).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function iconInline(id){ const r=RESOURCE_MAP[id]; return r? r.icon : '❔'; }
+
+function renderItemList(list, title, desc){
+  return `
+    <div class="section-head">
+      <div class="section-title">${title}</div>
+      <div class="section-desc">${desc}</div>
+    </div>
+    <div class="card-grid">${list.map(itemCard).join('')}</div>
+  `;
+}
+
+function renderFavorites(){
+  const ids=[...favorites];
+  if(ids.length===0){
+    return `
+      <div class="section-head">
+        <div class="section-title">⭐ Favoritos</div>
+        <div class="section-desc">Aún no has marcado ningún recurso u objeto como favorito.</div>
+      </div>
+      <div class="empty-state"><div class="em-ic">⭐</div>Pulsa la estrella en cualquier ficha para guardarla aquí.</div>
+    `;
+  }
+  const resFavs = ids.filter(id=>RESOURCE_MAP[id]);
+  const itemFavs = ids.filter(id=>OBJECT_MAP[id]||VEHICLE_MAP[id]||TRAIN_MAP[id]||AUTOMATION_MAP[id]);
+  return `
+    <div class="section-head">
+      <div class="section-title">⭐ Favoritos</div>
+      <div class="section-desc">Guardados localmente en tu navegador (localStorage): siguen aquí aunque cierres la app.</div>
+    </div>
+    <div class="card-grid">
+      ${resFavs.map(id=>resourceCard(RESOURCE_MAP[id])).join('')}
+      ${itemFavs.map(id=>itemCard(OBJECT_MAP[id]||VEHICLE_MAP[id]||TRAIN_MAP[id]||AUTOMATION_MAP[id])).join('')}
+    </div>
+  `;
+}
+
+function renderPlanets(){
+  return `
+    <div class="section-head">
+      <div class="section-title">🌍 Planetas</div>
+      <div class="section-desc">Cinco planetas y dos lunas conforman el sistema de Astroneer. Cada uno tiene recursos primarios, secundarios y una combinación única de gases.</div>
+    </div>
+    <div class="planet-grid">
+      ${PLANETS.slice().sort((a,b)=>a.order-b.order).map(p=>`
+        <div class="planet-card" style="background:linear-gradient(160deg, ${p.color}22, var(--panel));" onclick="openPlanet('${p.id}')">
+          <div class="pc-orb" style="background:${p.color};"></div>
+          <h3>${p.icon ? `<img src="${p.icon}" alt="${p.name}" style="width:32px;height:32px;object-fit:contain;vertical-align:middle;margin-right:8px;">` : ''}<span>${p.name}</span></h3>
+          <div class="sub">${p.level}</div>
+          <div class="diff-row">${Array.from({length:5}).map((_,i)=>`<span class="diff-dot ${i<p.difficulty?'on':''}"></span>`).join('')}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderTechTree(){
+  const tiers = [
+    {name:'Nivel 1 · Supervivencia básica', items:['Terrain Tool','Tether','Oxygen Tank','Small Generator','Small Printer'], cost:'Gratis / inicial'},
+    {name:'Nivel 2 · Primeras estructuras', items:['Smelting Furnace','Medium Printer','Small Storage','Trade Platform','Research Chamber'], cost:'Bytes bajos'},
+    {name:'Nivel 3 · Química y automatización', items:['Chemistry Lab','Atmospheric Condenser','Auto Arm','Medium Storage Silo'], cost:'~1600 Bytes (Chemistry Lab)'},
+    {name:'Nivel 4 · Vehículos y expansión', items:['Rover','Tractor','Large Rover','Large Printer','Large Shredder'], cost:'Bytes medios'},
+    {name:'Nivel 5 · Endgame', items:['Nanocarbon Alloy','VTOL','Train Engine','Auto Extractor (Large)'], cost:'Bytes altos + recursos avanzados'}
+  ];
+  return `
+    <div class="section-head">
+      <div class="section-title">📚 Árbol tecnológico</div>
+      <div class="section-desc">Progresión aproximada de investigación: cada nivel se apoya en los materiales desbloqueados en el anterior. Los Bytes se consiguen investigando recursos y objetos de exploración en la Cámara de Investigación.</div>
+    </div>
+    <div class="card-grid" style="grid-template-columns:1fr;">
+      ${tiers.map((t,i)=>`
+        <div class="panel">
+          <h3>${i+1}. ${t.name} <span class="tag" style="margin-left:auto;">${t.cost}</span></h3>
+          <div class="pill-row">${t.items.map(x=>`<span class="pill">${x}</span>`).join('')}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* ============================================================
+   DETALLE: recurso individual + árbol de fabricación
+   ============================================================ */
+function reverseRecipeUses(id){
+  // ¿En qué recetas de otros RECURSOS participa este id?
+  return RESOURCES.filter(r=> r.recipe && r.recipe.some(ing=>ing.id===id));
+}
+function itemsUsing(id){
+  // ¿En qué OBJETOS/VEHÍCULOS/TRENES/AUTOMATIZACIÓN participa este recurso?
+  return ALL_ITEMS.filter(it => it.materials && it.materials.some(m=>m.id===id));
+}
+
+function buildTree(id, qty, depth, visited){
+  const r = RESOURCE_MAP[id];
+  if(!r) return '';
+  const label = `<div class="tree-row" onclick="event.stopPropagation();openResource('${id}')">
+      ${iconInline(id)} <span class="qty">${qty}×</span> ${r.name} <span style="color:var(--text-faint);font-size:11px;">(${r.en})</span>
+    </div>`;
+  if(!r.recipe || r.recipe.length===0 || depth>5 || (visited && visited.has(id))){
+    return `<div class="tree-node">${label}</div>`;
+  }
+  const nv = new Set(visited); nv.add(id);
+  const children = r.recipe.map(ing=>buildTree(ing.id, ing.qty, depth+1, nv)).join('');
+  return `<div class="tree-node">${label}<div class="tree-children">${children}</div></div>`;
+}
+
+function openResource(id){
+  const r = RESOURCE_MAP[id];
+  if(!r) return;
+  const fav = favorites.has(id);
+  const usedInRecipes = reverseRecipeUses(id);
+  const usedInItems = itemsUsing(id);
+  const foundHtml = (r.found && r.found.length)
+    ? r.found.map(pid=>`<span class="pill" onclick="event.stopPropagation();openPlanet('${pid}')">${PLANET_MAP[pid].icon ? `<img src="${PLANET_MAP[pid].icon}" alt="${PLANET_MAP[pid].name}" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;margin-right:6px;">` : ''}<span>${PLANET_MAP[pid].name}</span></span>`).join('')
+    : `<span class="tag">No se extrae de planetas — solo se fabrica</span>`;
+
+  const html = `
+    <div class="detail-head">
+      <div class="detail-icon" style="background:linear-gradient(150deg, ${r.color}33, ${r.color}14); color:${r.color}; box-shadow:inset 0 0 0 1px ${r.color}55;">${r.icon}</div>
+      <div class="detail-title">
+        <h2>${r.name} <button class="fav-btn ${fav?'active':''}" style="font-size:20px;" onclick="toggleFav('${r.id}', event); refreshDetail('${r.id}')">${fav?'★':'☆'}</button></h2>
+        <div class="en">${r.en}</div>
+        <div class="rc-tags">
+          <span class="tag">${typeLabel(r.type)}</span>
+          <span class="tag">${r.rarity}</span>
+          <span class="stars" style="align-self:center;">${starRating(r.importance)}</span>
+        </div>
+      </div>
+      <button class="close-x" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body">
+      <div class="dsec">
+        <h4>Descripción y obtención</h4>
+        <p>${r.obtain}</p>
+      </div>
+      <div class="dsec">
+        <h4>Procesamiento</h4>
+        <div class="method-flags">
+          <span class="mflag ${r.centrifuge?'yes':''}">${r.centrifuge?'✓':'✕'} Centrifugadora de Tierra</span>
+          <span class="mflag ${r.furnace?'yes':''}">${r.furnace?'✓':'✕'} Requiere Fundidora</span>
+          <span class="mflag ${r.lab?'yes':''}">${r.lab?'✓':'✕'} Requiere Laboratorio Químico</span>
+        </div>
+        <p style="margin-top:10px;">${r.process || 'No requiere procesamiento adicional.'}</p>
+      </div>
+      <div class="dsec">
+        <h4>Dónde encontrarlo</h4>
+        <div class="pill-row">${foundHtml}</div>
+      </div>
+      ${r.recipe && r.recipe.length ? `
+      <div class="dsec">
+        <h4>Árbol de fabricación (¿de qué está hecho?)</h4>
+        <div class="tree">${buildTree(r.id, 1, 0, new Set())}</div>
+      </div>` : ''}
+      <div class="dsec">
+        <h4>¿Qué se puede fabricar con esto? (árbol inverso)</h4>
+        ${ (usedInRecipes.length===0 && usedInItems.length===0) ? '<p>No participa como ingrediente directo de otra receta registrada.</p>' : `
+        <div class="pill-row">
+          ${usedInRecipes.map(u=>`<span class="pill" onclick="openResource('${u.id}')">${u.icon} ${u.name}</span>`).join('')}
+          ${usedInItems.map(u=>`<span class="pill" onclick="openItem('${u.id}')">📦 ${u.name}</span>`).join('')}
+        </div>`}
+      </div>
+      <div class="dsec">
+        <h4>Consejos útiles</h4>
+        <p>${r.tips}</p>
+      </div>
+      <div class="dsec">
+        <h4>Curiosidad</h4>
+        <div class="trivia-box">💡 ${r.trivia}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('detail-modal').innerHTML = html;
+  document.getElementById('overlay').classList.add('show');
+}
+function refreshDetail(id){ openResource(id); }
+
+function openItem(id){
+  const it = OBJECT_MAP[id] || VEHICLE_MAP[id] || TRAIN_MAP[id] || AUTOMATION_MAP[id];
+  if(!it) return;
+  const fav = favorites.has(id);
+  const html = `
+    <div class="detail-head">
+      <div class="detail-icon" style="background:linear-gradient(150deg, #ffb06633, #ffb06614); color:#ffb066;">📦</div>
+      <div class="detail-title">
+        <h2>${it.name} <button class="fav-btn ${fav?'active':''}" style="font-size:20px;" onclick="toggleFav('${it.id}', event); openItem('${it.id}')">${fav?'★':'☆'}</button></h2>
+        <div class="en">${it.en}</div>
+        <div class="rc-tags"><span class="tag">${it.printer}</span>${it.cat?`<span class="tag">${it.cat}</span>`:''}</div>
+      </div>
+      <button class="close-x" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body">
+      <div class="dsec"><h4>Descripción</h4><p>${it.desc}</p></div>
+      <div class="dsec">
+        <h4>Materiales de fabricación</h4>
+        ${it.materials.length ? `<div class="pill-row">${it.materials.map(m=>`<span class="pill" onclick="openResource('${m.id}')">${iconInline(m.id)} <span class="qty">${m.qty}×</span> ${RESOURCE_MAP[m.id] ? RESOURCE_MAP[m.id].name : m.id}</span>`).join('')}</div>`
+          : '<p>No requiere materiales (disponible desde el inicio de la partida).</p>'}
+        <p style="margin-top:8px;font-size:11.5px;color:var(--text-faint);">* Impresora y materiales confirmados contra la wiki oficial; las cantidades exactas pueden variar 1 unidad según el parche — verifícalas en la impresora in-game si algo no cuadra.</p>
+      </div>
+      <div class="dsec"><h4>Uso</h4><p>${it.uses}</p></div>
+      <div class="dsec"><h4>Consejos</h4><p>${it.tips}</p></div>
+    </div>
+  `;
+  document.getElementById('detail-modal').innerHTML = html;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function openPlanet(id){
+  const p = PLANET_MAP[id];
+  if(!p) return;
+  const exclusiveResources = RESOURCES.filter(r=>r.found && r.found.length && r.found.every(f=>f===id) && r.found.length===1);
+  const html = `
+    <div class="detail-head" style="background:linear-gradient(160deg, ${p.color}22, transparent);">
+      <div class="detail-icon" style="background:${p.color}22; color:${p.color};">${p.icon ? `<img src="${p.icon}" alt="${p.name}" style="width:60px;height:60px;object-fit:contain;">` : ''}</div>
+      <div class="detail-title">
+        <h2>${p.name}</h2>
+        <div class="en">${p.level}</div>
+      </div>
+      <button class="close-x" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body">
+      <div class="dsec"><h4>Descripción</h4><p>${p.desc}</p></div>
+      <div class="dsec">
+        <h4>Datos clave</h4>
+        <div class="kv-grid">
+          <div class="kv"><div class="k">Dificultad</div><div class="v">${'●'.repeat(p.difficulty)}${'○'.repeat(5-p.difficulty)}</div></div>
+          <div class="kv"><div class="k">Nivel recomendado</div><div class="v">${p.level}</div></div>
+          <div class="kv"><div class="k">Recurso primario</div><div class="v">${p.primary}</div></div>
+          <div class="kv"><div class="k">Recurso secundario</div><div class="v">${p.secondary}</div></div>
+        </div>
+      </div>
+      <div class="dsec">
+        <h4>Recursos destacados</h4>
+        <p>${p.exclusive}</p>
+      </div>
+      <div class="dsec">
+        <h4>Gases atmosféricos</h4>
+        <div class="pill-row">${p.gases.length ? p.gases.map(g=>{
+          const gid=g.toLowerCase();
+          return `<span class="pill" onclick="openResource('${gid}')">${iconInline(gid)} ${RESOURCE_MAP[gid]?RESOURCE_MAP[gid].name:g}</span>`;
+        }).join('') : '<span class="tag">Sin atmósfera — no se puede usar el Condensador Atmosférico</span>'}</div>
+      </div>
+      <div class="dsec"><h4>Riesgos</h4><p>${p.risks}</p></div>
+      <div class="dsec"><h4>Consejos</h4><div class="trivia-box">💡 ${p.tips}</div></div>
+    </div>
+  `;
+  document.getElementById('detail-modal').innerHTML = html;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeDetail(){
+  document.getElementById('overlay').classList.remove('show');
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDetail(); });
+
+/* ============================================================
+   BUSCADOR
+   ============================================================ */
+function searchAll(query){
+  const q = query.trim().toLowerCase();
+  if(!q) return [];
+  const results = [];
+  RESOURCES.forEach(r=>{
+    if(r.name.toLowerCase().includes(q) || r.en.toLowerCase().includes(q)){
+      results.push({id:r.id, name:r.name, cat:typeLabel(r.type), icon:r.icon, color:r.color, kind:'resource'});
+    }
+  });
+  ALL_ITEMS.forEach(it=>{
+    if(it.name.toLowerCase().includes(q) || it.en.toLowerCase().includes(q)){
+      results.push({id:it.id, name:it.name, cat:it.printer||'Objeto', icon:'📦', color:'#ffb066', kind:'item'});
+    }
+  });
+  PLANETS.forEach(p=>{
+    if(p.name.toLowerCase().includes(q)){
+      results.push({id:p.id, name:p.name, cat:'Planeta', icon:p.icon, color:p.color, kind:'planet'});
+    }
+  });
+  return results.slice(0,30);
+}
+
+const searchInput = document.getElementById('search-input');
+const searchResultsEl = document.getElementById('search-results');
+searchInput.addEventListener('input', ()=>{
+  const q = searchInput.value;
+  if(!q.trim()){ searchResultsEl.classList.remove('show'); return; }
+  const results = searchAll(q);
+  if(results.length===0){
+    searchResultsEl.innerHTML = `<div class="sr-empty">Sin resultados para "${escapeHtml(q)}"</div>`;
+  } else {
+    searchResultsEl.innerHTML = results.map(r=>`
+      <div class="sr-item" onclick="selectSearchResult('${r.kind}','${r.id}')">
+        <div class="sr-ic" style="background:${r.color}22;color:${r.color};">${r.icon}</div>
+        <div class="sr-txt"><div class="name">${r.name}</div><div class="cat">${r.cat}</div></div>
+      </div>`).join('');
+  }
+  searchResultsEl.classList.add('show');
+});
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.search-wrap')) searchResultsEl.classList.remove('show');
+});
+function selectSearchResult(kind, id){
+  searchResultsEl.classList.remove('show');
+  searchInput.value='';
+  if(kind==='resource') openResource(id);
+  else if(kind==='item') openItem(id);
+  else if(kind==='planet') openPlanet(id);
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ============================================================
+   BOTÓN VOLVER ARRIBA
+   ============================================================ */
+window.addEventListener('scroll', ()=>{
+  const btn = document.getElementById('backtop');
+  if(window.scrollY > 400) btn.classList.add('show'); else btn.classList.remove('show');
+});
+
+/* ============================================================
+   INICIO
+   ============================================================ */
+render();
+</script>
+</body>
+</html>
