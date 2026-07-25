@@ -849,7 +849,7 @@ const RESOURCE_MAP = Object.fromEntries(RESOURCES.map(r=>[r.id,r]));
    in-game si algo no cuadra exactamente con tu versión. */
 const OBJECTS = [
   // ---- Mochila (Backpack Printer) — gratis, disponible desde el minuto uno ----
-  {id:'tether', name:'Amarre (Tether)', en:'Tether', cat:'soporte vital', printer:'Mochila',
+  {id:'tether', name:'Amarre (Tether)', en:'Tether', cat:'soporte vital', printer:'Mochila', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Tether.webp',
    materials:[{id:'compound',qty:1}], desc:'Cable que suministra oxígeno y energía desde la base o el traje a zonas alejadas.',
    uses:'Herramienta esencial de exploración: marca tu camino y te mantiene con vida en cuevas.',
    tips:'Colócalos en línea recta y no muy alejados entre sí para asegurar un flujo constante de oxígeno.'},
@@ -1314,9 +1314,10 @@ function resourceCard(r){
 
 function itemCard(it){
   const fav = favorites.has(it.id);
+  const itemIcon = it.icon || '📦';
   return `<div class="res-card" onclick="openItem('${it.id}')">
     <div class="top-row">
-      ${iconCircle('#ffb066','📦')}
+      ${iconCircle('#ffb066',itemIcon)}
       <div style="min-width:0;">
         <div class="rc-name">${it.name}</div>
         <div class="rc-en">${it.en}</div>
@@ -1668,9 +1669,10 @@ function openItem(id){
   const it = OBJECT_MAP[id] || VEHICLE_MAP[id] || TRAIN_MAP[id] || AUTOMATION_MAP[id];
   if(!it) return;
   const fav = favorites.has(id);
+  const itemIconDisplay = it.icon ? `<img src="${it.icon}" alt="${it.name}" style="width:50px;height:50px;object-fit:contain;">` : '📦';
   const html = `
     <div class="detail-head">
-      <div class="detail-icon" style="background:linear-gradient(150deg, #ffb06633, #ffb06614); color:#ffb066;">📦</div>
+      <div class="detail-icon" style="background:linear-gradient(150deg, #ffb06633, #ffb06614); color:#ffb066;">${itemIconDisplay}</div>
       <div class="detail-title">
         <h2>${it.name} <button class="fav-btn ${fav?'active':''}" style="font-size:20px;" onclick="toggleFav('${it.id}', event); openItem('${it.id}')">${fav?'★':'☆'}</button></h2>
         <div class="en">${it.en}</div>
@@ -1756,7 +1758,7 @@ function searchAll(query){
   });
   ALL_ITEMS.forEach(it=>{
     if(it.name.toLowerCase().includes(q) || it.en.toLowerCase().includes(q)){
-      results.push({id:it.id, name:it.name, cat:it.printer||'Objeto', icon:'📦', color:'#ffb066', kind:'item'});
+      results.push({id:it.id, name:it.name, cat:it.printer||'Objeto', icon:it.icon||'📦', color:'#ffb066', kind:'item'});
     }
   });
   PLANETS.forEach(p=>{
