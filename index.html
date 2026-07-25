@@ -439,43 +439,43 @@ nav.menu{display:flex;flex-direction:column;gap:2px;}
    ================================================================================== */
 
 const PLANETS = [
-  {id:'sylva',   name:'Sylva',   icon:'', color:'#6bdc9c', order:1,
+  {id:'sylva',   name:'Sylva',   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp', color:'#6bdc9c', order:1,
     desc:'El planeta natal e inicio de toda partida. Bosques, colinas y cuevas moderadas. El mejor lugar para aprender las bases del juego.',
     difficulty:1, level:'Inicial', primary:'Laterite', secondary:'Sphalerite',
     exclusive:'Laterite y Sphalerite en abundancia; también hay Malachite y Ammonium.',
     gases:['Hydrogen','Nitrogen'], risks:'Fauna hostil escasa; algunas plantas explosivas y espinas.',
     tips:'Construye tu base cerca de una cueva con Compound y Resin visibles: te ahorrará muchos viajes al principio.'},
-  {id:'desolo',  name:'Desolo',  icon:'', color:'#9aa5bd', order:2,
+  {id:'desolo',  name:'Desolo',  icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Desolo.webp', color:'#9aa5bd', order:2,
     desc:'Luna árida de Sylva, pequeña y sin atmósfera. Ideal para una primera excursión corta en cohete.',
     difficulty:1, level:'Temprano', primary:'Laterite', secondary:'Wolframite',
     exclusive:'Wolframite (Tungsteno) en cuevas; Sphalerite en montañas.',
     gases:[], risks:'Sin gases que recolectar (no tiene atmósfera). Terreno con cráteres pronunciados.',
     tips:'Aunque no tiene gases, es la fuente más cómoda de Wolframite para tu primer Chemistry Lab.'},
-  {id:'calidor',name:'Calidor', icon:'', color:'#ffb066', order:3,
+  {id:'calidor',name:'Calidor', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Calidor.webp', color:'#ffb066', order:3,
     desc:'Un desierto cálido y ventoso, segundo planeta desde la estrella. Buen sitio para paneles solares.',
     difficulty:2, level:'Temprano-medio', primary:'Malachite', secondary:'Titanite',
     exclusive:'Grandes yacimientos de Malachite (Copper) y Titanite (Titanium).',
     gases:['Sulfur','Methane'], risks:'Tormentas de arena que reducen visibilidad; fauna territorial.',
     tips:'Trae suficiente energía solar: la alta insolación hace que los paneles rindan al máximo aquí.'},
-  {id:'vesania', name:'Vesania', icon:'', color:'#b78bff', order:4,
+  {id:'vesania', name:'Vesania', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Vesania.webp', color:'#b78bff', order:4,
     desc:'Un mundo exótico cubierto de vegetación densa y colinas onduladas. Alberga enormes vetas de Litio.',
     difficulty:3, level:'Medio', primary:'Lithium', secondary:'Quartz',
     exclusive:'Litio en grandes cantidades; Hematite en cuevas profundas.',
     gases:['Hydrogen','Nitrogen','Methane'], risks:'Vegetación agresiva y terreno muy irregular; fácil perderse en cuevas profundas.',
     tips:'Es la mejor fuente de Litio del juego: llévate varios contenedores llenos antes de irte.'},
-  {id:'novus',   name:'Novus',   icon:'', color:'#4fd6ff', order:5,
+  {id:'novus',   name:'Novus',   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Novus.webp', color:'#4fd6ff', order:5,
     desc:'Luna de Vesania con un ciclo día/noche muy corto (unos 210 segundos). Rica en Hematite y Laterite.',
     difficulty:2, level:'Medio', primary:'Hematite', secondary:'Laterite',
     exclusive:'Clústeres densos de Hematite y Laterite; Litio y Ammonium en menor medida.',
     gases:['Hydrogen','Methane'], risks:'El día/noche rápido complica la energía solar; conviene usar viento o baterías grandes.',
     tips:'Buena parada rápida para reponer combustible (Hydrazine) y batería antes de ir a Glacio o Atrox.'},
-  {id:'glacio',  name:'Glacio',  icon:'', color:'#dfefff', order:6,
+  {id:'glacio',  name:'Glacio',  icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Glacio.webp', color:'#dfefff', order:6,
     desc:'El planeta más alejado de la estrella: paisajes helados y el mejor lugar para Titanium e Iron.',
     difficulty:4, level:'Avanzado', primary:'Hematite', secondary:'Titanite',
     exclusive:'Iron y Titanium en abundancia; también Litio, Ammonium, Clay y Quartz.',
     gases:['Argon'], risks:'Frío extremo, ciclos día/noche largos (~20 min) con poca luz solar efectiva; usa energía eólica o RTG.',
     tips:'Es la mejor fuente de Argon del juego, esencial para el Steel y el Titanium Alloy.'},
-  {id:'atrox',   name:'Atrox',   icon:'', color:'#ff6b6b', order:7,
+  {id:'atrox',   name:'Atrox',   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Atrox.webp', color:'#ff6b6b', order:7,
     desc:'El planeta más cercano a la estrella: niebla tóxica, plantas muy agresivas y el único lugar con Helio.',
     difficulty:5, level:'Avanzado / endgame', primary:'—', secondary:'—',
     exclusive:'Ningún recurso sólido exclusivo (solo universales), pero es la única fuente de Helium.',
@@ -1068,7 +1068,7 @@ const VEHICLES = [
 ];
 const VEHICLE_MAP = Object.fromEntries(VEHICLES.map(v=>[v.id,v]));
 
-/* ---------------- FERROCARRIL ---------------- */
+/* ---------------- Estación de tren ---------------- */
 const TRAINS = [
   {id:'train_engine', name:'Locomotora', en:'Train Engine', cat:'tren', printer:'Impresora Grande',
    materials:[{id:'titanium_alloy',qty:1}], desc:'Motor del tren; se desplaza sobre raíles previamente construidos con la Herramienta de Terreno.',
@@ -1149,19 +1149,19 @@ function showToast(msg){
    MENÚ LATERAL
    ============================================================ */
 const MENU = [
-  {id:'inicio', label:'Inicio', icon:''},
-  {id:'naturales', label:'Recursos naturales', icon:''},
-  {id:'refinados', label:'Recursos refinados', icon:''},
+  {id:'inicio', label:'Inicio', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/Home/Icon_Astroneer.webp'},
+  {id:'naturales', label:'Recursos naturales', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Terrain_Tool.webp'},
+  {id:'refinados', label:'Recursos refinados', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Smelting_Furnace.webp'},
   //{id:'compuestos', label:'Recursos compuestos', icon:''},
-  {id:'gases', label:'Gases', icon:''},
-  {id:'quimica', label:'Laboratorio de química', icon:''},
-  {id:'objetos', label:'Objetos imprimibles', icon:'  '},
-  {id:'vehiculos', label:'Vehículos', icon:''},
-  {id:'ferrocarril', label:'Ferrocarril', icon:''},
-  {id:'automatizacion', label:'Automatización', icon:''},
+  {id:'gases', label:'Gases', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Atmospheric_Condenser.webp'},
+  {id:'quimica', label:'Laboratorio de química', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Chemistry_Lab.webp'},
+  {id:'objetos', label:'Objetos imprimibles', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Tier_Large.webp'},
+  {id:'vehiculos', label:'Vehículos', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Rover.webp'},
+  {id:'Estación de tren', label:'Estación de tren', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Rail_Station.webp'},
+  {id:'automatizacion', label:'Automatización', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Crane.webp'},
   {id:'favoritos', label:'Favoritos', icon:'⭐'},
-  {id:'planetas', label:'Planetas', icon:''},
-  {id:'tecnologia', label:'Árbol tecnológico', icon:''}
+  {id:'planetas', label:'Planetas', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp'},
+  {id:'tecnologia', label:'Árbol tecnológico', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/tree-fam.png'}
 ];
 
 function countFor(id){
@@ -1173,7 +1173,7 @@ function countFor(id){
     case 'quimica': return RESOURCES.filter(r=>r.type==='composite').length;
     case 'objetos': return OBJECTS.length;
     case 'vehiculos': return VEHICLES.length;
-    case 'ferrocarril': return TRAINS.length;
+    case 'Estación de tren': return TRAINS.length;
     case 'automatizacion': return AUTOMATION.length;
     case 'favoritos': return favorites.size;
     case 'planetas': return PLANETS.length;
@@ -1265,13 +1265,13 @@ function render(){
   switch(currentSection){
     case 'inicio': c.innerHTML = renderHome(); break;
     case 'naturales': c.innerHTML = renderResourceList('natural','🌿 Recursos naturales','Materiales que se extraen directamente del terreno con la Herramienta de Terreno o la Centrifugadora de Tierra.'); break;
-    case 'refinados': c.innerHTML = renderResourceList('refined','<img src="" alt="Smelting Furnace" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:8px;"> Recursos refinados','Se obtienen fundiendo recursos naturales en la Fundidora (Smelting Furnace).'); break;
+    case 'refinados': c.innerHTML = renderResourceList('refined','<img src="https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Smelting_Furnace.webp" alt="Smelting Furnace" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:8px;"> Recursos refinados','Se obtienen fundiendo recursos naturales en la Fundidora (Smelting Furnace).'); break;
     case 'compuestos': c.innerHTML = renderResourceList('composite','⚗️ Recursos compuestos','Se sintetizan en el Laboratorio Químico combinando dos o más recursos, a veces con un gas.'); break;
     case 'gases': c.innerHTML = renderResourceList('gas','☁️ Gases','Recursos atmosféricos recolectados con el Condensador Atmosférico; su disponibilidad varía por planeta.'); break;
     case 'quimica': c.innerHTML = renderChemistry(); break;
     case 'objetos': c.innerHTML = renderItemList(OBJECTS,'📦 Objetos imprimibles','Estructuras y objetos que se fabrican en las impresoras, con sus materiales y utilidad.'); break;
     case 'vehiculos': c.innerHTML = renderItemList(VEHICLES,'🚜 Vehículos','Rovers, remolques y vehículos aéreos para explorar y transportar recursos.'); break;
-    case 'ferrocarril': c.innerHTML = renderItemList(TRAINS,'🚂 Ferrocarril','El sistema de trenes permite transporte masivo y automatizado sobre raíles.'); break;
+    case 'Estación de tren': c.innerHTML = renderItemList(TRAINS,'🚂 Estación de tren','El sistema de trenes permite transporte masivo y automatizado sobre raíles.'); break;
     case 'automatizacion': c.innerHTML = renderItemList(AUTOMATION,'🤖 Automatización','Brazos, extractores y sensores para que tu base funcione sola.'); break;
     case 'favoritos': c.innerHTML = renderFavorites(); break;
     case 'planetas': c.innerHTML = renderPlanets(); break;
