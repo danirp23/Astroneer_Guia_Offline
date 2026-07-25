@@ -11,9 +11,9 @@
    paneles flotantes redondeados y acentos naranja "traje EXO".
    ============================================================ */
 :root{
-  --bg:            #13213d;
-  --bg-soft:       #0f244e;
-  --panel:         #171f31;
+  --bg:            #0d1119;
+  --bg-soft:       #10151f;
+  --panel:         #161c29;
   --panel-2:       #1c2333;
   --panel-hover:   #212a3d;
   --border:        #2a3247;
@@ -104,7 +104,12 @@ nav.menu{display:flex;flex-direction:column;gap:2px;}
   background:linear-gradient(90deg, rgba(255,138,61,.16), rgba(255,138,61,.03));
   color:var(--accent-2);border-color:rgba(255,138,61,.25);
 }
-.menu-item .ic{font-size:16px;width:20px;text-align:center;}
+.menu-item .ic{
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.menu-item .ic img{
+    width:20px;height:20px;object-fit:contain;display:block;
+}
 .menu-item .count{
   margin-left:auto;font-size:10.5px;color:var(--text-faint);
   background:var(--bg-soft);padding:2px 7px;border-radius:20px;
@@ -171,6 +176,18 @@ nav.menu{display:flex;flex-direction:column;gap:2px;}
   color:var(--accent);font-weight:700;margin-bottom:6px;
 }
 .section-title{font-size:26px;font-weight:800;}
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.section-title img{
+    width:28px;
+    height:28px;
+    object-fit:contain;
+    flex-shrink:0;
+}
 .section-desc{color:var(--text-dim);font-size:14px;margin-top:6px;max-width:760px;line-height:1.55;}
 
 /* ---------- stat grid (home) ---------- */
@@ -1148,21 +1165,76 @@ function showToast(msg){
 /* ============================================================
    MENÚ LATERAL
    ============================================================ */
-const MENU = [
-  {id:'inicio', label:'Inicio', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/Home/Icon_Astroneer.webp'},
-  {id:'naturales', label:'Recursos naturales', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Terrain_Tool.webp'},
-  {id:'refinados', label:'Recursos refinados', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Smelting_Furnace.webp'},
-  //{id:'compuestos', label:'Recursos compuestos', icon:''},
-  {id:'gases', label:'Gases', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Atmospheric_Condenser.webp'},
-  {id:'quimica', label:'Laboratorio de química', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Chemistry_Lab.webp'},
-  {id:'objetos', label:'Objetos imprimibles', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Tier_Large.webp'},
-  {id:'vehiculos', label:'Vehículos', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Rover.webp'},
-  {id:'Estación de tren', label:'Estación de tren', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Rail_Station.webp'},
-  {id:'automatizacion', label:'Automatización', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Crane.webp'},
-  {id:'favoritos', label:'Favoritos', icon:'⭐'},
-  {id:'planetas', label:'Planetas', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp'},
-  {id:'tecnologia', label:'Árbol tecnológico', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/tree-fam.png'}
-];
+// MENU se completa después de definir SECTIONS_CONFIG
+let MENU = [];
+function initMenu(){
+  MENU = [
+    {id:'inicio', label:'Inicio', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/Home/Icon_Astroneer.webp'},
+    {id:'naturales', label:SECTIONS_CONFIG.naturales.label, icon:SECTIONS_CONFIG.naturales.icon},
+    {id:'refinados', label:SECTIONS_CONFIG.refinados.label, icon:SECTIONS_CONFIG.refinados.icon},
+    //{id:'compuestos', label:'Recursos compuestos', icon:''},
+    {id:'gases', label:SECTIONS_CONFIG.gases.label, icon:SECTIONS_CONFIG.gases.icon},
+    {id:'quimica', label:SECTIONS_CONFIG.quimica.label, icon:SECTIONS_CONFIG.quimica.icon},
+    {id:'objetos', label:SECTIONS_CONFIG.objetos.label, icon:SECTIONS_CONFIG.objetos.icon},
+    {id:'vehiculos', label:SECTIONS_CONFIG.vehiculos.label, icon:SECTIONS_CONFIG.vehiculos.icon},
+    {id:'Estación de tren', label:SECTIONS_CONFIG.estacion_tren.label, icon:SECTIONS_CONFIG.estacion_tren.icon},
+    {id:'automatizacion', label:SECTIONS_CONFIG.automatizacion.label, icon:SECTIONS_CONFIG.automatizacion.icon},
+    {id:'favoritos', label:'Favoritos', icon:'⭐'},
+    {id:'planetas', label:'Planetas', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp'},
+    {id:'tecnologia', label:'Árbol tecnológico', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/tree-fam.png'}
+  ];
+}
+
+/* ============================================================
+   CONFIGURACIÓN DE SECCIONES (Títulos e íconos centralizados)
+   ============================================================ */
+const SECTIONS_CONFIG = {
+  naturales: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Terrain_Tool.webp',
+    label: 'Recursos naturales',
+    description: 'Materiales que se extraen directamente del terreno con la Herramienta de Terreno o la Centrifugadora de Tierra.'
+  },
+  refinados: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Smelting_Furnace.webp',
+    label: 'Recursos refinados',
+    description: 'Se obtienen fundiendo recursos naturales en la Fundidora (Smelting Furnace).'
+  },
+  compuestos: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Chemistry_Lab.webp',
+    label: 'Recursos compuestos',
+    description: 'Se sintetizan en el Laboratorio Químico combinando dos o más recursos, a veces con un gas.'
+  },
+  gases: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Atmospheric_Condenser.webp',
+    label: 'Gases',
+    description: 'Recursos atmosféricos recolectados con el Condensador Atmosférico; su disponibilidad varía por planeta.'
+  },
+  quimica: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Chemistry_Lab.webp',
+    label: 'Laboratorio de química',
+    description: 'El Chemistry Lab combina dos (o tres) recursos —a veces con un gas de por medio— para crear los materiales más avanzados del juego. Pulsa cualquier compuesto para ver su árbol de fabricación completo.'
+  },
+  objetos: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Tier_Large.webp',
+    label: 'Objetos imprimibles',
+    description: 'Estructuras y objetos que se fabrican en las impresoras, con sus materiales y utilidad.'
+  },
+  vehiculos: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Rover.webp',
+    label: 'Vehículos',
+    description: 'Rovers, remolques y vehículos aéreos para explorar y transportar recursos.'
+  },
+  estacion_tren: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Rail_Station.webp',
+    label: 'Estación de tren',
+    description: 'El sistema de trenes permite transporte masivo y automatizado sobre raíles.'
+  },
+  automatizacion: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Crane.webp',
+    label: 'Automatización',
+    description: 'Brazos, extractores y sensores para que tu base funcione sola.'
+  }
+};
 
 function countFor(id){
   switch(id){
@@ -1256,6 +1328,11 @@ function itemCard(it){
 
 function truncate(s,n){ if(!s) return ''; return s.length>n ? s.slice(0,n-1)+'…' : s; }
 
+function makeIconHtml(icon, label){
+  if(icon.startsWith('http')) return `<img src="${icon}"> ${label}`;
+  return icon + ' ' + label;
+}
+
 /* ============================================================
    RENDER: secciones principales
    ============================================================ */
@@ -1264,15 +1341,51 @@ function render(){
   const c = document.getElementById('content');
   switch(currentSection){
     case 'inicio': c.innerHTML = renderHome(); break;
-    case 'naturales': c.innerHTML = renderResourceList('natural','🌿 Recursos naturales','Materiales que se extraen directamente del terreno con la Herramienta de Terreno o la Centrifugadora de Tierra.'); break;
-    case 'refinados': c.innerHTML = renderResourceList('refined','<img src="https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Smelting_Furnace.webp" alt="Smelting Furnace" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:8px;"> Recursos refinados','Se obtienen fundiendo recursos naturales en la Fundidora (Smelting Furnace).'); break;
-    case 'compuestos': c.innerHTML = renderResourceList('composite','⚗️ Recursos compuestos','Se sintetizan en el Laboratorio Químico combinando dos o más recursos, a veces con un gas.'); break;
-    case 'gases': c.innerHTML = renderResourceList('gas','☁️ Gases','Recursos atmosféricos recolectados con el Condensador Atmosférico; su disponibilidad varía por planeta.'); break;
-    case 'quimica': c.innerHTML = renderChemistry(); break;
-    case 'objetos': c.innerHTML = renderItemList(OBJECTS,'📦 Objetos imprimibles','Estructuras y objetos que se fabrican en las impresoras, con sus materiales y utilidad.'); break;
-    case 'vehiculos': c.innerHTML = renderItemList(VEHICLES,'🚜 Vehículos','Rovers, remolques y vehículos aéreos para explorar y transportar recursos.'); break;
-    case 'Estación de tren': c.innerHTML = renderItemList(TRAINS,'🚂 Estación de tren','El sistema de trenes permite transporte masivo y automatizado sobre raíles.'); break;
-    case 'automatizacion': c.innerHTML = renderItemList(AUTOMATION,'🤖 Automatización','Brazos, extractores y sensores para que tu base funcione sola.'); break;
+    case 'naturales': {
+      const cfg = SECTIONS_CONFIG.naturales;
+      c.innerHTML = renderResourceList('natural', makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
+    case 'refinados': {
+      const cfg = SECTIONS_CONFIG.refinados;
+      c.innerHTML = renderResourceList('refined', makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
+    case 'compuestos': {
+      const cfg = SECTIONS_CONFIG.compuestos;
+      c.innerHTML = renderResourceList('composite', makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
+    case 'gases': {
+      const cfg = SECTIONS_CONFIG.gases;
+      c.innerHTML = renderResourceList('gas', makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
+    case 'quimica': {
+      const cfg = SECTIONS_CONFIG.quimica;
+      c.innerHTML = renderChemistry(makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
+    case 'objetos': {
+      const cfg = SECTIONS_CONFIG.objetos;
+      c.innerHTML = renderItemList(OBJECTS, makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
+    case 'vehiculos': {
+      const cfg = SECTIONS_CONFIG.vehiculos;
+      c.innerHTML = renderItemList(VEHICLES, makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
+    case 'Estación de tren': {
+      const cfg = SECTIONS_CONFIG.estacion_tren;
+      c.innerHTML = renderItemList(TRAINS, makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
+    case 'automatizacion': {
+      const cfg = SECTIONS_CONFIG.automatizacion;
+      c.innerHTML = renderItemList(AUTOMATION, makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
     case 'favoritos': c.innerHTML = renderFavorites(); break;
     case 'planetas': c.innerHTML = renderPlanets(); break;
     case 'tecnologia': c.innerHTML = renderTechTree(); break;
@@ -1342,12 +1455,12 @@ function renderResourceList(type, title, desc){
   `;
 }
 
-function renderChemistry(){
+function renderChemistry(titleHtml, description){
   const list = RESOURCES.filter(r=>r.type==='composite');
   return `
     <div class="section-head">
-      <div class="section-title">🧪 Laboratorio de Química</div>
-      <div class="section-desc">El Chemistry Lab combina dos (o tres) recursos —a veces con un gas de por medio— para crear los materiales más avanzados del juego. Pulsa cualquier compuesto para ver su árbol de fabricación completo.</div>
+      <div class="section-title">${titleHtml}</div>
+      <div class="section-desc">${description}</div>
     </div>
     <div class="card-grid">
       ${list.map(r=>`
@@ -1684,6 +1797,7 @@ window.addEventListener('scroll', ()=>{
 /* ============================================================
    INICIO
    ============================================================ */
+initMenu();
 render();
 </script>
 </body>
