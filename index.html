@@ -4,390 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Astropedia · Enciclopedia offline de Astroneer</title>
-<style>
-/* ============================================================
-   ASTROPEDIA — hoja de estilos
-   Paleta inspirada en el HUD de Astroneer: azul-noche profundo,
-   paneles flotantes redondeados y acentos naranja "traje EXO".
-   ============================================================ */
-:root{
-  --bg:            #1a1436;
-  --bg-soft:       #201a42;
-  --panel:         #2a2255;
-  --panel-2:       #332a66;
-  --panel-hover:   #3d3277;
-  --border:        #4a3d8f;
-  --border-soft:   #3a2f70;
-  --text:          #f5eeff;
-  --text-dim:      #c3b8e8;
-  --text-faint:    #8f80c2;
-  --accent:        #ff8a3d;
-  --accent-2:      #ffb066;
-  --accent-dim:    #cf6a25;
-  --accent-glow:   rgba(255,138,61,.35);
-  --blue:          #5be3ff;
-  --green:         #7ef2b8;
-  --purple:        #d4a3ff;
-  --red:           #ff7a8a;
-  --radius-lg:     18px;
-  --radius-md:     12px;
-  --radius-sm:     8px;
-  --shadow:        0 8px 30px rgba(0,0,0,.45);
-  --sidebar-w:     252px;
-}
-
-*{box-sizing:border-box;}
-html,body{height:100%;}
-body{
-  margin:0;
-  background:
-    radial-gradient(1200px 700px at 85% -10%, rgba(255,138,61,.08), transparent 60%),
-    radial-gradient(900px 600px at -10% 100%, rgba(79,214,255,.06), transparent 60%),
-    var(--bg);
-  color:var(--text);
-  font-family:'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
-::selection{background:var(--accent-glow);}
-::-webkit-scrollbar{width:10px;height:10px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
-::-webkit-scrollbar-thumb:hover{background:var(--accent-dim);}
-
-a{color:var(--accent-2);text-decoration:none;}
-h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:.2px;}
-p{margin:0;}
-
-/* ---------- layout shell ---------- */
-#app{display:flex;min-height:100vh;}
-
-/* ---------- sidebar ---------- */
-#sidebar{
-  width:var(--sidebar-w);
-  flex-shrink:0;
-  background:linear-gradient(180deg, var(--panel), var(--bg-soft));
-  border-right:1px solid var(--border-soft);
-  padding:20px 14px 14px;
-  position:fixed;
-  top:0;left:0;bottom:0;
-  overflow-y:auto;
-  z-index:50;
-  transition:transform .25s ease;
-}
-.brand{
-  display:flex;align-items:center;gap:10px;
-  padding:6px 10px 18px;
-  border-bottom:1px solid var(--border-soft);
-  margin-bottom:14px;
-}
-.brand-badge{
-  width:38px;height:38px;border-radius:10px;
-  display:flex;justify-content:center;
-  font-size:20px;
-  flex-shrink:0;
-}
-.brand-text .t1{font-size:16px;font-weight:800;color:var(--text);}
-.brand-text .t2{font-size:10.5px;color:var(--text-faint);letter-spacing:.6px;text-transform:uppercase;}
-
-nav.menu{display:flex;flex-direction:column;gap:2px;}
-.menu-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:var(--radius-sm);
-  color:var(--text-dim);cursor:pointer;font-size:14px;font-weight:600;
-  border:1px solid transparent;
-  transition:background .15s, color .15s, border-color .15s, transform .1s;
-  user-select:none;
-}
-.menu-item:hover{background:var(--panel-2);color:var(--text);}
-.menu-item.active{
-  background:linear-gradient(90deg, rgba(255,138,61,.16), rgba(255,138,61,.03));
-  color:var(--accent-2);border-color:rgba(255,138,61,.25);
-}
-.menu-item .ic{
-  width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.menu-item .ic img{
-    width:20px;height:20px;object-fit:contain;display:block;
-}
-.menu-item .count{
-  margin-left:auto;font-size:10.5px;color:var(--text-faint);
-  background:var(--bg-soft);padding:2px 7px;border-radius:20px;
-}
-.menu-item.active .count{color:var(--accent);}
-.menu-sep{height:1px;background:var(--border-soft);margin:10px 6px;}
-
-#sidebar-footer{margin-top:16px;padding:10px 12px;font-size:11px;color:var(--text-faint);line-height:1.5;}
-
-/* ---------- main column ---------- */
-#main-col{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column;}
-
-#topbar{
-  position:sticky;top:0;z-index:40;
-  display:flex;align-items:center;gap:12px;
-  padding:14px 26px;
-  background:rgba(19, 25, 39, 0.85);backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border-soft);
-}
-#menu-toggle{display:none;}
-.search-wrap{
-  flex:1;max-width:640px;position:relative;
-}
-.search-wrap input{
-  width:100%;padding:11px 16px 11px 42px;
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:999px;color:var(--text);font-size:14px;outline:none;
-  transition:border-color .15s, box-shadow .15s;
-}
-.search-wrap input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-glow);}
-.search-wrap .sic{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:15px;pointer-events:none;}
-.search-results{
-  position:absolute;top:calc(100% + 8px);left:0;right:0;
-  background:var(--panel-2);border:1px solid var(--border);
-  border-radius:var(--radius-md);box-shadow:var(--shadow);
-  max-height:420px;overflow-y:auto;display:none;z-index:60;
-}
-.search-results.show{display:block;}
-.sr-item{
-  display:flex;align-items:center;gap:10px;padding:10px 14px;
-  cursor:pointer;border-bottom:1px solid var(--border-soft);
-}
-.sr-item:last-child{border-bottom:none;}
-.sr-item:hover{background:var(--panel-hover);}
-.sr-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.sr-txt .name{font-size:13.5px;font-weight:600;color:var(--text);}
-.sr-txt .cat{font-size:11px;color:var(--text-faint);}
-.sr-empty{padding:16px;text-align:center;color:var(--text-faint);font-size:13px;}
-
-.topbar-actions{display:flex;gap:8px;align-items:center;}
-.btn-ghost{
-  background:var(--panel);border:1px solid var(--border);color:var(--text-dim);
-  padding:9px 14px;border-radius:999px;font-size:13px;cursor:pointer;font-weight:600;
-  transition:.15s;white-space:nowrap;
-}
-.btn-ghost:hover{color:var(--text);border-color:var(--accent-dim);}
-
-#content{padding:26px 30px 80px;max-width:1280px;width:100%;}
-
-/* ---------- generic section header ---------- */
-.section-head{margin-bottom:22px;}
-.section-eyebrow{
-  font-size:11px;letter-spacing:2px;text-transform:uppercase;
-  color:var(--accent);font-weight:700;margin-bottom:6px;
-}
-.section-title{font-size:26px;font-weight:800;}
-.section-title{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.section-title img{
-    width:28px;
-    height:28px;
-    object-fit:contain;
-    flex-shrink:0;
-}
-.section-desc{color:var(--text-dim);font-size:14px;margin-top:6px;max-width:760px;line-height:1.55;}
-
-/* ---------- stat grid (home) ---------- */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin:22px 0 30px;}
-.stat-card{
-  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
-  padding:18px 18px;position:relative;overflow:hidden;transition:transform .15s, border-color .15s;
-}
-.stat-card:hover{transform:translateY(-3px);border-color:var(--accent-dim);}
-.stat-card .num{font-size:30px;font-weight:800;color:var(--accent-2);}
-.stat-card .lbl{font-size:12px;color:var(--text-dim);margin-top:4px;}
-.stat-card .glow{position:absolute;right:-20px;top:-20px;width:80px;height:80px;background:var(--accent);opacity:.08;border-radius:50%;filter:blur(10px);}
-
-.home-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;}
-@media(max-width:1000px){.home-grid{grid-template-columns:1fr;}}
-.panel{
-  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-lg);
-  padding:20px;
-}
-.panel h3{font-size:15px;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:8px;}
-.mini-list{display:flex;flex-direction:column;gap:8px;}
-.mini-row{
-  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);
-  cursor:pointer;transition:background .15s;
-}
-.mini-row:hover{background:var(--panel-2);}
-.mini-row .mi-name{font-size:13.5px;font-weight:600;}
-.mini-row .mi-sub{font-size:11px;color:var(--text-faint);margin-left:auto;}
-
-/* ---------- planet chip row on home ---------- */
-.planet-strip{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
-.planet-chip{
-  display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;
-  background:var(--panel-2);border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:600;
-  transition:.15s;
-}
-.planet-chip:hover{border-color:var(--accent-dim);color:var(--accent-2);}
-
-/* ---------- card grids ---------- */
-.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
-.chip{
-  padding:7px 14px;border-radius:999px;background:var(--panel);border:1px solid var(--border);
-  font-size:12.5px;font-weight:600;color:var(--text-dim);cursor:pointer;transition:.15s;
-}
-.chip:hover{color:var(--text);}
-.chip.active{background:var(--accent);border-color:var(--accent);color:#1a0f05;}
-
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
-
-.res-card{
-  background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius-md);
-  padding:16px;cursor:pointer;position:relative;transition:transform .15s, border-color .15s, box-shadow .15s;
-  display:flex;flex-direction:column;gap:10px;
-}
-.res-card:hover{transform:translateY(-3px);border-color:var(--accent-dim);box-shadow:var(--shadow);}
-.res-card .top-row{display:flex;align-items:center;gap:10px;}
-.res-icon{
-  width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
-}
-.res-card .rc-name{font-size:14.5px;font-weight:700;color:var(--text);}
-.res-card .rc-en{font-size:11px;color:var(--text-faint);}
-.fav-btn{
-  margin-left:auto;background:none;border:none;color:var(--text-faint);font-size:16px;cursor:pointer;
-  padding:2px 4px;border-radius:6px;transition:.15s;
-}
-.fav-btn:hover{color:var(--accent);}
-.fav-btn.active{color:var(--accent);}
-.rc-tags{display:flex;gap:6px;flex-wrap:wrap;}
-.tag{font-size:10px;padding:3px 8px;border-radius:6px;background:var(--panel-2);color:var(--text-dim);font-weight:600;letter-spacing:.3px;}
-.stars{font-size:11px;color:var(--accent-2);letter-spacing:1px;}
-.rc-desc{font-size:12px;color:var(--text-dim);line-height:1.45;}
-
-/* ---------- detail / modal ---------- */
-#overlay{
-  position:fixed;inset:0;background:rgba(6,8,13,.72);backdrop-filter:blur(3px);
-  display:none;align-items:flex-start;justify-content:center;z-index:100;padding:40px 16px;overflow-y:auto;
-}
-#overlay.show{display:flex;}
-.detail-modal{
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);
-  width:100%;max-width:760px;box-shadow:0 30px 60px rgba(0,0,0,.6);animation:pop .18s ease;
-}
-@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:none;}}
-.detail-head{
-  display:flex;align-items:flex-start;gap:16px;padding:24px 26px;border-bottom:1px solid var(--border-soft);
-  position:relative;
-}
-.detail-icon{
-  width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-}
-.detail-title h2{font-size:21px;}
-.detail-title .en{font-size:12.5px;color:var(--text-faint);margin-top:2px;}
-.detail-title .rc-tags{margin-top:8px;}
-.close-x{
-  position:absolute;top:18px;right:20px;background:var(--panel-2);border:1px solid var(--border);
-  color:var(--text-dim);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;
-}
-.close-x:hover{color:var(--text);}
-.detail-body{padding:6px 26px 26px;}
-.dsec{margin-top:20px;}
-.dsec h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:10px;}
-.dsec p, .dsec div.txt{font-size:13.5px;color:var(--text-dim);line-height:1.6;}
-.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.kv{background:var(--bg-soft);border:1px solid var(--border-soft);border-radius:var(--radius-sm);padding:10px 12px;}
-.kv .k{font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;}
-.kv .v{font-size:13.5px;font-weight:600;color:var(--text);margin-top:3px;}
-.pill-row{display:flex;flex-wrap:wrap;gap:7px;}
-.pill{
-  display:inline-flex;align-items:center;gap:6px;background:var(--panel-2);border:1px solid var(--border);
-  padding:6px 11px;border-radius:999px;font-size:12.5px;cursor:pointer;transition:.15s;
-}
-.pill:hover{border-color:var(--accent-dim);color:var(--accent-2);}
-.pill .qty{color:var(--accent-2);font-weight:700;}
-.method-flags{display:flex;gap:8px;flex-wrap:wrap;}
-.mflag{font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);color:var(--text-faint);}
-.mflag.yes{color:var(--green);border-color:rgba(107,220,156,.3);background:rgba(107,220,156,.06);}
-
-/* recipe tree */
-.tree{padding-left:0;}
-.tree-node{margin:4px 0;}
-.tree-row{
-  display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);
-  background:var(--bg-soft);border:1px solid var(--border-soft);cursor:pointer;font-size:13px;
-  transition:.15s;
-}
-.tree-row:hover{border-color:var(--accent-dim);}
-.tree-row .qty{color:var(--accent-2);font-weight:700;font-size:12px;}
-.tree-children{margin-left:22px;border-left:1px dashed var(--border);padding-left:14px;margin-top:4px;}
-.tree-arrow{color:var(--text-faint);font-size:12px;}
-
-.trivia-box{
-  background:linear-gradient(120deg, rgba(255,138,61,.08), transparent);
-  border:1px solid rgba(255,138,61,.2);border-radius:var(--radius-md);padding:12px 14px;font-size:13px;
-  color:var(--text-dim);line-height:1.5;
-}
-
-/* planets */
-.planet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-.planet-card{
-  border-radius:var(--radius-lg);padding:20px;cursor:pointer;position:relative;overflow:hidden;
-  border:1px solid var(--border-soft);transition:transform .15s;min-height:150px;
-  display:flex;flex-direction:column;justify-content:flex-end;
-}
-.planet-card:hover{transform:translateY(-4px);}
-.planet-card .pc-orb{
-  position:absolute;top:-30px;right:-30px;width:110px;height:110px;border-radius:50%;opacity:.5;filter:blur(2px);
-}
-.planet-card h3{font-size:19px;position:relative;z-index:1;}
-.planet-card .sub{font-size:12px;color:var(--text-dim);position:relative;z-index:1;margin-top:4px;}
-.diff-row{display:flex;gap:5px;margin-top:10px;position:relative;z-index:1;}
-.diff-dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
-.diff-dot.on{background:var(--accent);}
-
-/* footer / empty states */
-.empty-state{text-align:center;padding:60px 20px;color:var(--text-faint);}
-.empty-state .em-ic{font-size:38px;margin-bottom:10px;}
-
-#backtop{
-  position:fixed;right:26px;bottom:26px;width:46px;height:46px;border-radius:50%;
-  background:var(--accent);color:#1a0f05;border:none;font-size:18px;cursor:pointer;
-  box-shadow:0 8px 22px var(--accent-glow);display:none;align-items:center;justify-content:center;z-index:70;
-  transition:transform .15s;
-}
-#backtop:hover{transform:translateY(-3px);}
-#backtop.show{display:flex;}
-
-.toast{
-  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--panel-2);border:1px solid var(--accent-dim);color:var(--text);
-  padding:11px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:200;opacity:0;
-  transition:.25s;pointer-events:none;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* mobile */
-#mobile-topbar{display:none;}
-@media(max-width:900px){
-  #sidebar{transform:translateX(-100%);box-shadow:20px 0 40px rgba(0,0,0,.5);}
-  #sidebar.open{transform:translateX(0);}
-  #main-col{margin-left:0;}
-  #mobile-topbar{
-    display:flex;align-items:center;gap:12px;padding:14px 16px;position:sticky;top:0;z-index:45;
-    background:var(--bg-soft);border-bottom:1px solid var(--border-soft);
-  }
-  #menu-toggle{
-    display:flex;background:var(--panel);border:1px solid var(--border);color:var(--text);
-    width:38px;height:38px;border-radius:10px;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0;
-  }
-  #topbar{padding:10px 14px;}
-  #content{padding:18px 14px 90px;}
-  .kv-grid{grid-template-columns:1fr;}
-  .home-grid{grid-template-columns:1fr;}
-  #sidebar-scrim{
-    display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49;
-  }
-  #sidebar-scrim.show{display:block;}
-}
-</style>
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
@@ -528,21 +145,21 @@ const RESOURCES = [
    recipe:[], tips:'Muy útil como combustible de generadores en las primeras horas de partida, antes de tener paneles solares.',
    trivia:'Distintas plantas de cada planeta producen Orgánico de apariencia distinta, aunque funcionalmente es el mismo recurso.'},
   {id:'quartz', name:'Cuarzo', en:'Quartz', type:'natural', color:'#dcdff0', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Quartz.webp', rarity:'Poco común', importance:3,
-   found:['sylva','vesania','glacio'],
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
    obtain:'Cristales prismáticos translúcidos que se encuentran en cuevas y afloramientos rocosos.',
    process:'Se puede usar en bruto o refinar en la Fundidora para obtener Vidrio (Glass).',
    centrifuge:false, furnace:true, lab:false,
    recipe:[], tips:'Guarda algo de Cuarzo sin refinar: lo necesitarás también para el Silicone en el Chemistry Lab.',
    trivia:'Es uno de los pocos recursos naturales que tiene uso tanto en bruto como refinado.'},
   {id:'clay', name:'Arcilla', en:'Clay', type:'natural', color:'#c98a5c', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Clay.webp', rarity:'Poco común', importance:2,
-   found:['vesania','novus','glacio'],
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
    obtain:'Depósitos de tono rojizo-marrón en superficie, normalmente en zonas onduladas.',
    process:'Se refina en la Fundidora para producir Cerámica (Ceramic).',
    centrifuge:false, furnace:true, lab:false,
    recipe:[], tips:'No tiene mucho uso sin refinar: fúndela en cuanto puedas para obtener Cerámica.',
-   trivia:'Es de los pocos recursos que no aparece en Sylva, por lo que muchos jugadores la traen en su primer viaje en cohete.'},
+   trivia:'A pesar de encontrarse en los siete planetas, es de los recursos más difíciles de distinguir a simple vista porque se confunde fácilmente con las rocas comunes del terreno.'},
   {id:'laterite', name:'Laterita', en:'Laterite', type:'natural', color:'#c94f3f', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Laterite.webp', rarity:'Común', importance:4,
-   found:['sylva','desolo','novus','glacio'],
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
    obtain:'Depósitos cilíndricos rojos y azules bajo la superficie, presentes en casi todos los planetas.',
    process:'Se refina en la Fundidora para obtener Aluminio (Aluminum).',
    centrifuge:false, furnace:true, lab:false,
@@ -556,14 +173,14 @@ const RESOURCES = [
    recipe:[], tips:'Calidor es la mejor fuente si necesitas Cobre para la Chemistry Lab o el Aluminum Alloy.',
    trivia:'Su color viene del mineral real malaquita, un carbonato de cobre.'},
   {id:'hematite', name:'Hematita', en:'Hematite', type:'natural', color:'#8a4a3d', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Hematite.webp', rarity:'Común (Novus/Glacio)', importance:4,
-   found:['vesania','novus','glacio'],
+   found:['novus','glacio'],
    obtain:'Depósitos de color rojo oscuro que se concentran especialmente en Novus y Glacio.',
    process:'Se refina en la Fundidora para obtener Hierro (Iron).',
    centrifuge:false, furnace:true, lab:false,
    recipe:[], tips:'Consigue grandes cantidades en Novus antes de ir a Glacio, así podrás fabricar Steel sin escasez.',
    trivia:'Nombrada por el mineral real de óxido de hierro que le da su color rojizo.'},
   {id:'titanite', name:'Titanita', en:'Titanite', type:'natural', color:'#d9d2c0', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Titanite.webp', rarity:'Poco común', importance:4,
-   found:['calidor','glacio'],
+   found:['calidor','vesania','glacio'],
    obtain:'Vetas de tono beige/gris claro, típicas de zonas rocosas y montañosas.',
    process:'Se refina en la Fundidora para obtener Titanio (Titanium).',
    centrifuge:false, furnace:true, lab:false,
@@ -583,15 +200,15 @@ const RESOURCES = [
    centrifuge:false, furnace:true, lab:false,
    recipe:[], tips:'El Zinc tiene pocos usos directos de fabricación, pero es útil para investigación temprana de bytes.',
    trivia:'Su nombre proviene del mineral real, principal fuente de zinc en la minería terrestre.'},
-  {id:'lithium', name:'Litio', en:'Lithium', type:'natural', color:'#f2a6c9', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Lithium.webp', rarity:'Abundante en Vesania', importance:3,
-   found:['vesania','novus','glacio'],
+  {id:'lithium', name:'Litio', en:'Lithium', type:'natural', color:'#f2a6c9', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Lithium.webp', rarity:'Abundante en Vesania y Novus', importance:3,
+   found:['vesania','novus'],
    obtain:'Nódulos en forma de fideos rizados rosados y dorados, muy abundantes en Vesania.',
    process:'No se puede refinar; se utiliza en bruto.',
    centrifuge:false, furnace:false, lab:false,
    recipe:[], tips:'Se usa sobre todo en baterías y componentes de investigación: trae bastante de Vesania para toda la partida.',
    trivia:'Es de los pocos metales que el juego trata como "no refinable", a diferencia del resto de minerales.'},
   {id:'ammonium', name:'Amonio', en:'Ammonium', type:'natural', color:'#f5d34a', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Ammonium.webp', rarity:'Poco común', importance:4,
-   found:['sylva','vesania','novus','glacio'],
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
    obtain:'Depósitos amarillos brillantes, normalmente cerca de zonas de aterrizaje y cuevas superficiales.',
    process:'No se refina; se usa directamente en el Chemistry Lab.',
    centrifuge:false, furnace:false, lab:false,
@@ -703,12 +320,12 @@ const RESOURCES = [
 
   // ---------- GASES (Condensador Atmosférico) ----------
   {id:'argon', name:'Argón', en:'Argon', type:'gas', color:'#7ab8ff', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/atmospheric/Icon_Argon.webp', rarity:'Exclusivo de Glacio', importance:4,
-   found:['glacio'],
+   found:['vesania','glacio'],
    obtain:'Único gas disponible en Glacio; se recolecta con el Condensador Atmosférico.',
    process:'Condensador Atmosférico (Atmospheric Condenser).',
    centrifuge:false, furnace:false, lab:false,
    recipe:[], tips:'Es la razón principal para instalar una base en Glacio: sin Argón no hay Steel ni Titanium Alloy.',
-   trivia:'Glacio es el único planeta con un solo tipo de gas atmosférico, según la wiki oficial.'},
+   trivia:'Poco común (Vesania y Glacio)'},
   {id:'helium', name:'Helio', en:'Helium', type:'gas', color:'#ffe08a', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/atmospheric/Icon_Helium.webp', rarity:'Exclusivo de Atrox', importance:5,
    found:['atrox'],
    obtain:'Solo se encuentra en la atmósfera de Atrox; requiere Condensador Atmosférico.',
@@ -717,19 +334,19 @@ const RESOURCES = [
    recipe:[], tips:'Imprescindible para el Nanocarbon Alloy: planifica bien tu viaje a Atrox, ya que es el planeta más peligroso.',
    trivia:'Es el único recurso auténticamente exclusivo de un solo planeta en todo el juego.'},
   {id:'hydrogen', name:'Hidrógeno', en:'Hydrogen', type:'gas', color:'#c9e8ff', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/atmospheric/Icon_Hydrogen.webp', rarity:'Común (varios planetas)', importance:5,
-   found:['sylva','vesania','novus'],
+   found:['sylva','calidor','vesania','novus'],
    obtain:'Disponible en la atmósfera de Sylva, Vesania y Novus mediante Condensador Atmosférico.',
    process:'Condensador Atmosférico.',
    centrifuge:false, furnace:false, lab:false,
    recipe:[], tips:'Base del Hydrazine, el combustible de cohetes y VTOL: instala tu primer condensador en Sylva.',
    trivia:'Aunque en el desarrollo se pensó en obtenerlo del hielo/agua, esa mecánica nunca llegó al juego final.'},
   {id:'methane', name:'Metano', en:'Methane', type:'gas', color:'#8fd6a0', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/atmospheric/Icon_Methane.webp', rarity:'Común (varios planetas)', importance:3,
-   found:['calidor','vesania','novus','atrox'],
+   found:['novus','atrox'],
    obtain:'Presente en la atmósfera de Calidor, Vesania, Novus y Atrox.',
    process:'Condensador Atmosférico.',
    centrifuge:false, furnace:false, lab:false,
    recipe:[], tips:'Necesario para el Silicone junto con Resin y Quartz.',
-   trivia:'Es de los gases más repartidos entre distintos planetas, por lo que rara vez escasea.'},
+   trivia:'Es el gas atmosférico con mayor valor de Bytes por unidad entre los que alcanzan una concentración del 100% en el Condensador Atmosférico.'},
   {id:'nitrogen', name:'Nitrógeno', en:'Nitrogen', type:'gas', color:'#a0c9ff', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/atmospheric/Icon_Nitrogen.webp', rarity:'Común (varios planetas)', importance:4,
    found:['sylva','vesania','atrox'],
    obtain:'Presente en la atmósfera de Sylva, Vesania y Atrox.',
