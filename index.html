@@ -1091,28 +1091,64 @@ const VEHICLES = [
 ];
 const VEHICLE_MAP = Object.fromEntries(VEHICLES.map(v=>[v.id,v]));
 
-/* ---------------- Estación de tren ---------------- */
+/* ---------------- Sistema Ferroviario ---------------- */
+
 const TRAINS = [
-  {id:'train_engine', name:'Locomotora', en:'Train Engine', cat:'tren', printer:'Impresora Grande',
-   materials:[{id:'titanium_alloy',qty:1}], desc:'Motor del tren; se desplaza sobre raíles previamente construidos con la Herramienta de Terreno.',
-   uses:'Transporte masivo y automatizable de recursos entre bases lejanas del mismo planeta.',
-   tips:'Combínala con Auto Arms en cada estación para cargar y descargar sin intervención manual.'},
-  {id:'train_storage_car', name:'Vagón de Almacenamiento', en:'Storage Silo Car', cat:'tren', printer:'Impresora Grande',
-   materials:[{id:'aluminum_alloy',qty:1}], desc:'Vagón con ranuras de almacenamiento para transportar recursos sólidos.',
-   uses:'La forma más eficiente de mover grandes cantidades de un recurso entre dos puntos fijos.',
-   tips:'Usa varios vagones en fila para maximizar la carga de cada viaje.'},
-  {id:'train_fluid_car', name:'Vagón de Fluidos', en:'Fluid Canister Car', cat:'tren', printer:'Impresora Grande',
-   materials:[{id:'aluminum_alloy',qty:1}], desc:'Vagón especializado en transportar contenedores de gas.',
-   uses:'Ideal para traer gases desde una zona de recolección remota hasta tu base de Chemistry Lab.',
-   tips:'Combínalo con un Condensador Atmosférico automatizado en el punto de partida.'},
-  {id:'train_xl_car', name:'Vagón Extra Grande', en:'Extra-Large Storage Car', cat:'tren', printer:'Impresora Grande',
-   materials:[{id:'aluminum_alloy',qty:2}], desc:'Versión de mayor capacidad del vagón de almacenamiento, para cargas masivas.',
-   uses:'Perfecto para proyectos de construcción a gran escala que requieren toneladas de un mismo material.',
-   tips:'Reserva estos vagones para tus rutas de mayor tráfico, ya que consumen más energía por tramo.'},
-  {id:'train_seat', name:'Asiento de Tren', en:'Train Seat', cat:'tren', printer:'Impresora Mediana',
-   materials:[{id:'plastic',qty:1}], desc:'Permite a un astronauta viajar sentado en la locomotora o un vagón.',
-   uses:'Convierte el tren en transporte de pasajeros además de mercancías.',
-   tips:'Útil para desplazarte tú mismo entre bases sin gastar combustible de rover.'}
+  {
+    id:'rail_engine', name:'Locomotora', en:'Rail Engine', cat:'tren', printer:'Impresora Mediana',
+    materials:[{id:'resin',qty:1}, {id:'aluminum',qty:1}, {id:'copper',qty:1}],
+    desc:'Vehículo ferroviario motorizado utilizado para desplazarse por las vías y arrastrar vagones.',
+    uses:'Permite transportar al jugador y automatizar rutas entre estaciones ferroviarias.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rail_Engine.webp',
+    tips:'Puede remolcar varios vagones y dispone de asiento, luz frontal y dos ranuras auxiliares.'
+  },
+
+  {
+    id:'rail_car', name:'Vagón Ferroviario', en:'Rail Car', cat:'tren', printer:'Impresora Mediana',
+    materials:[{id:'resin',qty:2}, {id:'aluminum',qty:1}],
+    desc:'Vagón modular que transporta cualquier objeto compatible con su ranura principal.',
+    uses:'Ideal para mover recursos, plataformas, silos, contenedores y maquinaria entre bases.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rail_Engine.webp',
+    tips:'Puedes colocar sobre él un Large Resource Canister, un Large Storage Silo o casi cualquier módulo de tamaño adecuado.'
+  },
+
+  {
+    id:'rail_station', name:'Estación Ferroviaria', en:'Rail Station', cat:'tren', printer:'Impresora Grande',
+    materials:[{id:'titanium',qty:2}, {id:'copper',qty:1}, {id:'quartz',qty:1}],
+    desc:'Estación donde los trenes pueden detenerse automáticamente.',
+    uses:'Permite cargar, descargar y controlar rutas mediante automatización.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Rail_Station.webp',
+    tips:'Combínala con Brazos Automáticos y sensores para crear sistemas logísticos completamente automáticos.'
+  },
+
+  {
+    id:'rail_post_bundle', name:'Paquete de Postes Ferroviarios', en:'Rail Post Bundle', cat:'tren',
+    printer:'Impresora Pequeña',
+    materials:[{id:'resin',qty:1}, {id:'aluminum',qty:1}],
+    desc:'Contiene 10 postes ferroviarios para construir vías.',
+    uses:'Extiende las líneas ferroviarias y también transmite oxígeno y energía.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rail_Post.webp',
+    tips:'Los postes se conectan automáticamente al colocarlos dentro del alcance.'
+  },
+
+  {
+    id:'tall_rail_post_bundle', name:'Paquete de Postes Ferroviarios Altos', en:'Tall Rail Post Bundle', cat:'tren',
+    printer:'Impresora Pequeña',
+    materials:[{id:'resin',qty:1},{id:'aluminum',qty:1}],
+    desc:'Versión elevada de los postes ferroviarios.',
+    uses:'Ideal para salvar desniveles o construir vías por encima del terreno.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rail_Post.webp',
+    tips:'Muy útiles para mantener las vías despejadas en terrenos irregulares.'
+  },
+
+  {
+    id:'rail_junction_bundle', name:'Paquete de Desvíos Ferroviarios', en:'Rail Junction Bundle', cat:'tren', printer:'Impresora Pequeña',
+    materials:[{id:'aluminum',qty:2}],
+    desc:'Contiene 5 desvíos ferroviarios.',
+    uses:'Permite dividir una vía en tres direcciones diferentes.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rail_Post.webp',
+    tips:'Puedes controlar automáticamente la dirección mediante pines y sensores.'
+  }
 ];
 const TRAIN_MAP = Object.fromEntries(TRAINS.map(t=>[t.id,t]));
 
