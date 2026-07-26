@@ -987,7 +987,7 @@ const OBJECTS = [
    tips:'Desbloquearlo cuesta 1600 Bytes en el Research Chamber; úsalo una vez para el logro "Lab Rat".'},
   {id:'atmospheric_condenser', name:'Condensador Atmosférico', en:'Atmospheric Condenser', cat:'estructura', printer:'Impresora Mediana',
    materials:[{id:'iron',qty:1},{id:'glass',qty:1},{id:'plastic',qty:1}], desc:'Condensa la atmósfera del planeta en gases utilizables en la Chemistry Lab.',
-   uses:'Necesario para obtener cualquier gas: Hydrogen, Nitrogen, Methane, Argon, Sulfur o Helium.',
+   uses:'Necesario para obtener cualquier gas: Hydrogen, Nitrogen, Methane, Argon, Sulfur o Helium.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Atmospheric_Condenser.webp',
    tips:'Colócalo en zonas altas para mayor eficiencia y conéctalo a contenedores de gas vacíos.'},
   {id:'trade_platform', name:'Plataforma de Comercio', en:'Trade Platform', cat:'estructura', printer:'Impresora Mediana',
    materials:[{id:'compound',qty:1},{id:'tungsten',qty:1},{id:'iron',qty:1}], desc:'Intercambia recursos por Scrap, y Scrap por otros recursos, a distintas tasas.',
@@ -1058,13 +1058,10 @@ const VEHICLES = [
    materials:[{id:'aluminum',qty:1},{id:'compound',qty:1}], desc:'Vehículo ligero de un asiento, rápido y con buena maniobrabilidad.',
    uses:'Un salto de calidad respecto al Tractor para desplazarte por la base y alrededores.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
    tips:'Añádele un Rover Seat si vas a llevar a otro astronauta contigo.'},
-  {id:'fluid_trailer', name:'Remolque de Fluidos', en:'Fluid Trailer', cat:'remolque', printer:'Impresora Mediana',
-   materials:[{id:'aluminum_alloy',qty:1}], desc:'Remolque especializado en transportar contenedores de gas.',
-   uses:'Imprescindible para traer gases (Helio, Argón...) desde planetas lejanos a tu base principal.',
-   tips:'Llévalo siempre vacío hacia Atrox o Glacio y vuelve cargado de gas.'},
   {id:'hoverboard', name:'Patineta Voladora', en:'Hoverboard', cat:'vehiculo', printer:'Impresora Mediana',
    materials:[{id:'titanium_alloy',qty:1}], desc:'Vehículo individual que se desliza sobre el terreno sin necesidad de ruedas.',
    uses:'Excelente para moverse rápido sobre terreno muy irregular o cuevas estrechas.',
+   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Hoverboard.webp',
    tips:'Consume energía de tu traje: lleva baterías o un RTG portátil si la vas a usar mucho tiempo.'},
   {id:'large_rover', name:'Rover Grande', en:'Large Rover', cat:'vehiculo', printer:'Impresora Grande',
    materials:[{id:'rubber',qty:2},{id:'aluminum_alloy',qty:2}], desc:'Vehículo de varios asientos con múltiples ranuras Tier 2/3, capaz de llevar remolques largos.',
@@ -1074,18 +1071,22 @@ const VEHICLES = [
   {id:'small_shuttle', name:'Lanzadera Pequeña', en:'Small Shuttle', cat:'vehiculo', printer:'Impresora Grande',
    materials:[{id:'aluminum',qty:2}], desc:'Tu primer vehículo espacial: te lleva a la órbita y a otros planetas.',
    uses:'Imprescindible para dejar Sylva por primera vez y empezar a explorar el sistema.',
+   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Shuttle.webp',
    tips:'Móntale un Solid-Fuel Thruster antes de despegar, y lleva otro de repuesto en la mochila.'},
   {id:'medium_shuttle', name:'Lanzadera Mediana', en:'Medium Shuttle', cat:'vehiculo', printer:'Impresora Grande',
    materials:[{id:'ceramic',qty:2},{id:'aluminum_alloy',qty:1}], desc:'Cohete de mayor capacidad, con más ranuras de carga que la lanzadera pequeña.',
    uses:'Permite llevar vehículos pequeños o varios silos de recursos entre planetas.',
+   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Shuttle.webp',
    tips:'Buen momento para actualizar cuando ya dependas de traer Copper o Tungsten de otro planeta.'},
   {id:'large_shuttle', name:'Lanzadera Grande', en:'Large Shuttle', cat:'vehiculo', printer:'Impresora Grande',
    materials:[{id:'ceramic',qty:2},{id:'titanium_alloy',qty:2}], desc:'El cohete de mayor capacidad, capaz de transportar rovers medianos completos.',
    uses:'Clave para trasladar un Rover Grande o un Tren completo a otro planeta.',
+   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Shuttle.webp',
    tips:'Vuela con Hydrazine Thrusters para maximizar la carga útil en cada viaje.'},
   {id:'vtol', name:'VTOL', en:'VTOL', cat:'vehiculo', printer:'Impresora Grande',
    materials:[{id:'titanium_alloy',qty:2},{id:'hydrazine',qty:2}], desc:'Vehículo de despegue vertical que vuela usando Hidrazina como combustible.',
    uses:'Perfecto para cruzar terrenos imposibles de atravesar en rover, como cañones o montañas.',
+   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_VTOL.webp',
    tips:'Lleva siempre Hidrazina de sobra: sin combustible se queda varado en pleno vuelo.'}
 ];
 const VEHICLE_MAP = Object.fromEntries(VEHICLES.map(v=>[v.id,v]));
@@ -1185,8 +1186,8 @@ function initMenu(){
     {id:'Estación de tren', label:SECTIONS_CONFIG.estacion_tren.label, icon:SECTIONS_CONFIG.estacion_tren.icon},
     {id:'automatizacion', label:SECTIONS_CONFIG.automatizacion.label, icon:SECTIONS_CONFIG.automatizacion.icon},
     {id:'favoritos', label:'Favoritos', icon:'⭐'},
-    {id:'planetas', label:'Planetas', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp'},
-    {id:'tecnologia', label:'Árbol tecnológico', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/tree-fam.png'}
+    {id:'planetas', label:SECTIONS_CONFIG.planetas.label, icon:SECTIONS_CONFIG.planetas.icon},
+    {id:'tecnologia', label:SECTIONS_CONFIG.arbol_tecnologico.label, icon:SECTIONS_CONFIG.arbol_tecnologico.icon}
   ];
 }
 
@@ -1238,6 +1239,16 @@ const SECTIONS_CONFIG = {
     icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Crane.webp',
     label: 'Automatización',
     description: 'Brazos, extractores y sensores para que tu base funcione sola.'
+  },
+  planetas: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp',
+    label: 'Planetas',
+    description: 'Cinco planetas y dos lunas conforman el sistema de Astroneer. Cada uno tiene recursos primarios, secundarios y una combinación única de gases.'
+  },
+  arbol_tecnologico: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/tree-fam.png',
+    label: 'Árbol tecnológico',
+    description: 'Progresión aproximada de investigación: cada nivel se apoya en los materiales desbloqueados en el anterior. Los Bytes se consiguen investigando recursos y objetos de exploración en la Cámara de Investigación.'
   }
 };
 
@@ -1395,8 +1406,16 @@ function render(){
       break;
     }
     case 'favoritos': c.innerHTML = renderFavorites(); break;
-    case 'planetas': c.innerHTML = renderPlanets(); break;
-    case 'tecnologia': c.innerHTML = renderTechTree(); break;
+    case 'planetas': {
+      const cfg = SECTIONS_CONFIG.planetas;
+      c.innerHTML =renderPlanets(makeIconHtml(cfg.icon, cfg.label), cfg.description)
+      break;
+    }
+    case 'tecnologia':{
+      const cfg = SECTIONS_CONFIG.arbol_tecnologico;
+      c.innerHTML = renderTechTree(makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
     default: c.innerHTML = renderHome();
   }
 }
@@ -1527,11 +1546,11 @@ function renderFavorites(){
   `;
 }
 
-function renderPlanets(){
+function renderPlanets(titleHtml, description){
   return `
     <div class="section-head">
-      <div class="section-title">🌍 Planetas</div>
-      <div class="section-desc">Cinco planetas y dos lunas conforman el sistema de Astroneer. Cada uno tiene recursos primarios, secundarios y una combinación única de gases.</div>
+      <div class="section-title">${titleHtml}</div>
+      <div class="section-desc">${description}</div>
     </div>
     <div class="planet-grid">
       ${PLANETS.slice().sort((a,b)=>a.order-b.order).map(p=>`
@@ -1546,18 +1565,18 @@ function renderPlanets(){
   `;
 }
 
-function renderTechTree(){
+function renderTechTree(titleHtml, description){
   const tiers = [
-    {name:'Nivel 1 · Supervivencia básica', items:['Terrain Tool','Tether','Oxygen Tank','Small Generator','Small Printer'], cost:'Gratis / inicial'},
-    {name:'Nivel 2 · Primeras estructuras', items:['Smelting Furnace','Medium Printer','Small Storage','Trade Platform','Research Chamber'], cost:'Bytes bajos'},
-    {name:'Nivel 3 · Química y automatización', items:['Chemistry Lab','Atmospheric Condenser','Auto Arm','Medium Storage Silo'], cost:'~1600 Bytes (Chemistry Lab)'},
-    {name:'Nivel 4 · Vehículos y expansión', items:['Rover','Tractor','Large Rover','Large Printer','Large Shredder'], cost:'Bytes medios'},
-    {name:'Nivel 5 · Endgame', items:['Nanocarbon Alloy','VTOL','Train Engine','Auto Extractor (Large)'], cost:'Bytes altos + recursos avanzados'}
+    {name:'Nivel 1 · Supervivencia básica', items:['Herramienta de Terreno','Cable de Oxígeno','Tanque de Oxígeno','Generador Pequeño','Impresora Pequeña'], cost:'Gratis / inicial'},
+    {name:'Nivel 2 · Primeras estructuras', items:['Horno de Fundición','Impresora Mediana','Almacenamiento Mediano','Plataforma de Intercambio','Cámara de Investigación'], cost:'Bytes bajos'},
+    {name:'Nivel 3 · Química y automatización', items:['Laboratorio de Química','Condensador Atmosférico','Brazo Automático','Silo de Almacenamiento Mediano'], cost:'~1600 Bytes (Laboratorio de Química)'},
+    {name:'Nivel 4 · Vehículos y expansión', items:['Rover','Tractor','Rover Grande','Impresora Grande','Trituradora Grande'], cost:'Bytes medios'},
+    {name:'Nivel 5 · Endgame', items:['Aleación de Nanocarbón','VTOL','Locomotora','Extractor Automático'], cost:'Bytes altos + recursos avanzados'}
   ];
   return `
     <div class="section-head">
-      <div class="section-title">📚 Árbol tecnológico</div>
-      <div class="section-desc">Progresión aproximada de investigación: cada nivel se apoya en los materiales desbloqueados en el anterior. Los Bytes se consiguen investigando recursos y objetos de exploración en la Cámara de Investigación.</div>
+      <div class="section-title">${titleHtml}</div>
+      <div class="section-desc">${description}</div>
     </div>
     <div class="card-grid" style="grid-template-columns:1fr;">
       ${tiers.map((t,i)=>`
