@@ -11,24 +11,24 @@
    paneles flotantes redondeados y acentos naranja "traje EXO".
    ============================================================ */
 :root{
-  --bg:            #0d1119;
-  --bg-soft:       #10151f;
-  --panel:         #161c29;
-  --panel-2:       #1c2333;
-  --panel-hover:   #212a3d;
-  --border:        #2a3247;
-  --border-soft:   #232a3c;
-  --text:          #e9edf5;
-  --text-dim:      #9aa5bd;
-  --text-faint:    #6b7590;
+  --bg:            #1a1436;
+  --bg-soft:       #201a42;
+  --panel:         #2a2255;
+  --panel-2:       #332a66;
+  --panel-hover:   #3d3277;
+  --border:        #4a3d8f;
+  --border-soft:   #3a2f70;
+  --text:          #f5eeff;
+  --text-dim:      #c3b8e8;
+  --text-faint:    #8f80c2;
   --accent:        #ff8a3d;
   --accent-2:      #ffb066;
   --accent-dim:    #cf6a25;
   --accent-glow:   rgba(255,138,61,.35);
-  --blue:          #4fd6ff;
-  --green:         #6bdc9c;
-  --purple:        #b78bff;
-  --red:           #ff6b6b;
+  --blue:          #5be3ff;
+  --green:         #7ef2b8;
+  --purple:        #d4a3ff;
+  --red:           #ff7a8a;
   --radius-lg:     18px;
   --radius-md:     12px;
   --radius-sm:     8px;
@@ -1395,6 +1395,7 @@ let MENU = [];
 function initMenu(){
   MENU = [
     {id:'inicio', label:'Inicio', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Shelter.webp'},
+    {id:'avanzada', label:'Búsqueda avanzada', icon:'🔍'},
     {id:'naturales', label:SECTIONS_CONFIG.naturales.label, icon:SECTIONS_CONFIG.naturales.icon},
     {id:'refinados', label:SECTIONS_CONFIG.refinados.label, icon:SECTIONS_CONFIG.refinados.icon},
     //{id:'compuestos', label:'Recursos compuestos', icon:''},
@@ -1579,6 +1580,7 @@ function render(){
   const c = document.getElementById('content');
   switch(currentSection){
     case 'inicio': c.innerHTML = renderHome(); break;
+    case 'avanzada': c.innerHTML = renderAdvancedSearch(); break;
     case 'naturales': {
       const cfg = SECTIONS_CONFIG.naturales;
       c.innerHTML = renderResourceList('natural', makeIconHtml(cfg.icon, cfg.label), cfg.description);
@@ -1688,6 +1690,26 @@ function renderHome(){
       </div>
     </div>
   `;
+}
+
+function renderAdvancedSearch(){
+  return `
+    <div class="section-head">
+      <div class="section-title">🔎 Búsqueda avanzada</div>
+      <div class="section-desc">Filtra los objetos imprimibles por el tipo de impresora que necesitas.</div>
+    </div>
+    <div class="pill-row" style="margin-bottom:16px;">
+      ${['Todas','Mochila','Impresora Pequeña','Impresora Mediana','Impresora Grande']
+        .map(p=>`<span class="tag" style="cursor:pointer;" onclick="filterByPrinter('${p}')">${p}</span>`).join('')}
+    </div>
+    <div class="card-grid" id="advanced-results">${ALL_ITEMS.map(itemCard).join('')}</div>
+  `;
+}
+
+function filterByPrinter(printer){
+  const el = document.getElementById('advanced-results');
+  const list = printer==='Todas' ? ALL_ITEMS : ALL_ITEMS.filter(it=>it.printer===printer);
+  el.innerHTML = list.map(itemCard).join('');
 }
 
 function renderResourceList(type, title, desc){
