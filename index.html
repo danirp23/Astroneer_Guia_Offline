@@ -604,6 +604,14 @@ const RESOURCES = [
    centrifuge:false, furnace:false, lab:false,
    recipe:[], tips:'Guárdalo para canjearlo por Scrap cuando necesites materiales puntuales que no tengas a mano.',
    trivia:'Es de los recursos más difíciles de encontrar en grandes cantidades, ideal como "moneda" de intercambio.'},
+  {id:'exo_chip', name:'Chip EXO', en:'EXO Chip', type:'natural', color:'#59d5ff', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_EXO_Chip.webp', rarity:'Muy raro', importance:5,
+   found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
+   obtain:'No aparece como un depósito mineral. Se obtiene abriendo Cachés EXO (EXO Caches), recuperando Grabadores de Datos de Vehículos (Vehicle Data Recorders) o intercambiando Astronio en la Plataforma de Comercio.',
+   process:'No puede refinarse ni fabricarse. Se utiliza directamente como componente para fabricar vehículos, módulos y equipos avanzados.',
+   centrifuge:false, furnace:false, lab:false,
+   recipe:[],
+   tips:'No lo gastes en el primer objeto disponible. Es un recurso limitado y muy valioso para fabricar tecnología avanzada como el VTOL, el Extractor Automático o los cohetes grandes.',
+   trivia:'Fue añadido con la actualización Automation para sustituir antiguas recetas y fomentar la exploración mediante las Cachés EXO y los restos de vehículos.'},
   {id:'graphite', name:'Grafito', en:'Graphite', type:'natural', color:'#3a3f4a', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_Graphite.webp', rarity:'Común', importance:4,
    found:['sylva','desolo','calidor','vesania','novus','glacio','atrox'],
    obtain:'Vetas oscuras y laminares presentes en todos los planetas.',
@@ -939,10 +947,6 @@ const OBJECTS = [
    materials:[{id:'rubber',qty:1},{id:'tungsten',qty:1}], desc:'Cable de remolque que engancha vehículos o carga suelta.',
    uses:'Salva vehículos volcados o atascados en pendientes pronunciadas.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Winch.webp',
    tips:'Llévalo en cualquier rover de exploración: te ahorra caminatas largas de rescate.'},
-  {id:'splitter', name:'Divisor (Splitter)', en:'Splitter', cat:'utilidad', printer:'Impresora Pequeña',
-   materials:[{id:'graphite',qty:1},{id:'copper',qty:1}], desc:'Divide una única ranura de conexión en varias salidas.',
-   uses:'Permite conectar más módulos de energía o de automatización sin ranuras libres.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Splitter.webp',
-   tips:'Muy útil en bases compactas donde te falten puertos de conexión.'},
   {id:'drill_head', name:'Cabezal de Perforación', en:'Drill Head', cat:'vehiculo', printer:'Impresora Pequeña',
    materials:[{id:'ceramic',qty:1},{id:'tungsten_carbide',qty:1}], desc:'Se instala en vehículos para perforar terreno automáticamente al conducir.',
    uses:'Excavación rápida de túneles y rampas sin usar la Herramienta de Terreno a mano.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Drill.webp',
@@ -1001,10 +1005,6 @@ const OBJECTS = [
    materials:[{id:'plastic',qty:1}], desc:'Permite solicitar misiones y recompensas de la organización EXO a cambio de recursos.',
    uses:'Fuente adicional de Bytes y objetos únicos completando misiones.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Trade_Platform.webp',
    tips:'Revisa las misiones activas regularmente: algunas piden materiales que ya tienes de sobra.'},
-  {id:'auto_arm', name:'Brazo Automático', en:'Auto Arm', cat:'automatización', printer:'Impresora Mediana',
-   materials:[{id:'aluminum_alloy',qty:1}], desc:'Mueve automáticamente objetos Tier 1 entre dos ranuras cercanas.',
-   uses:'Automatiza el trasvase de nuggets entre Fundidora, Chemistry Lab y contenedores.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Crane.webp',
-   tips:'Funciona muy bien colocado entre dos Silos Medianos o Grandes para crear una cadena de producción continua.'},
 
   // ---- Impresora Grande (Large Printer) ----
   {id:'extra_large_platform_a', name:'Plataforma Extra Grande A', en:'Extra-Large Platform A', cat:'estructura', printer:'Impresora Grande',
@@ -1153,27 +1153,210 @@ const TRAINS = [
 const TRAIN_MAP = Object.fromEntries(TRAINS.map(t=>[t.id,t]));
 
 /* ---------------- AUTOMATIZACIÓN ---------------- */
+
 const AUTOMATION = [
-  {id:'auto_arm_a', name:'Brazo Automático', en:'Auto Arm', cat:'automatizacion', printer:'Impresora Mediana',
-   materials:[{id:'aluminum_alloy',qty:1}], desc:'Transfiere objetos Tier 1 automáticamente entre dos ranuras adyacentes.',
-   uses:'La pieza más básica y versátil de cualquier línea de producción automatizada.',
-   tips:'Puedes encadenar varios Auto Arms para mover recursos a lo largo de toda tu base.'},
-  {id:'auto_extractor_a', name:'Extractor Automático', en:'Auto Extractor (Large)', cat:'automatizacion', printer:'Impresora Grande',
-   materials:[{id:'aluminum_alloy',qty:2}], desc:'Extrae recursos de un depósito de forma continua sin destruir el terreno.',
-   uses:'Base de cualquier granja de recursos automatizada.',
-   tips:'Combínalo con un Silo y un Auto Arm para una mina 100% autónoma.'},
-  {id:'switch_activated', name:'Interruptor Activado', en:'Switch Activated Platform', cat:'automatizacion', printer:'Impresora Mediana',
-   materials:[{id:'plastic',qty:1}], desc:'Activa o desactiva un módulo conectado según el estado de un interruptor.',
-   uses:'Controla generadores, luces o extractores de forma manual o remota.',
-   tips:'Combínalo con sensores para crear sistemas que se activan solos ante ciertas condiciones.'},
-  {id:'sensor_motion', name:'Sensor de Movimiento', en:'Motion Sensor', cat:'automatizacion', printer:'Impresora Mediana',
-   materials:[{id:'plastic',qty:1}], desc:'Detecta movimiento cercano y envía una señal a los módulos conectados.',
-   uses:'Ideal para trampas, luces automáticas o alertas de proximidad.',
-   tips:'Colócalo en la entrada de tu base para activar luces solo cuando alguien se acerque.'},
-  {id:'sensor_power', name:'Sensor de Energía', en:'Power Sensor', cat:'automatizacion', printer:'Impresora Mediana',
-   materials:[{id:'plastic',qty:1}], desc:'Detecta el nivel de energía de la red y activa o desactiva módulos según un umbral.',
-   uses:'Permite encender generadores de respaldo solo cuando la batería baja de cierto nivel.',
-   tips:'Combínalo con un Small Generator para tener energía de emergencia totalmente automática.'}
+  {
+    id:'auto_arm',
+    name:'Brazo Automático',
+    en:'Auto Arm',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'aluminum',qty:1},
+      {id:'graphite',qty:1}
+    ],
+    desc:'Transfiere automáticamente objetos de Nivel 1 entre dos áreas de trabajo.',
+    uses:'Clasificación, fabricación automática y transporte de recursos.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Crane.webp',
+    tips:'Coloca un recurso en la ranura del filtro para que solo transporte ese objeto.'
+  },
+
+  {
+    id:'auto_extractor',
+    name:'Extractor Automático',
+    en:'Auto Extractor',
+    cat:'automatizacion',
+    printer:'Impresora Grande',
+    materials:[
+      {id:'steel',qty:2},
+      {id:'tungsten_carbide',qty:1},
+      {id:'rubber',qty:1},
+      {id:'exo_chip',qty:1},
+    ],
+    desc:'Extrae recursos automáticamente sin destruir el depósito.',
+    uses:'Minería continua y granjas automáticas de recursos.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Auto_Extractor.webp',
+    tips:'Produce muchas más unidades por depósito que la Herramienta de Terreno.'
+  },
+
+  {
+    id:'power_sensor',
+    name:'Sensor de Energía',
+    en:'Power Sensor',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'zinc',qty:1},
+      {id:'copper',qty:1}
+    ],
+    desc:'Envía una señal cuando la energía aparece o desaparece.',
+    uses:'Encender generadores, luces o módulos automáticamente.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Sensor.webp',
+    tips:'Muy útil para crear sistemas de energía de respaldo.'
+  },
+
+  {
+    id:'storage_sensor',
+    name:'Sensor de Almacenamiento',
+    en:'Storage Sensor',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'zinc',qty:1},
+      {id:'quartz',qty:1}
+    ],
+    desc:'Detecta cuándo un almacenamiento está lleno o vacío.',
+    uses:'Automatizar impresoras, brazos y trenes.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Sensor.webp',
+    tips:'Perfecto para lanzar automáticamente plataformas de intercambio o controlar estaciones ferroviarias.'
+  },
+
+  {
+    id:'battery_sensor',
+    name:'Sensor de Batería',
+    en:'Battery Sensor',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'zinc',qty:1},
+      {id:'graphite',qty:1}
+    ],
+    desc:'Detecta el estado de carga de las baterías conectadas.',
+    uses:'Control inteligente del consumo eléctrico.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Sensor.webp',
+    tips:'Puede activar generadores únicamente cuando la batería esté descargándose.'
+  },
+
+  {
+    id:'button_repeater',
+    name:'Repetidor de Botón',
+    en:'Button Repeater',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'zinc',qty:1}
+    ],
+    desc:'Envía una señal cada vez que se activa.',
+    uses:'Disparador manual para cualquier circuito lógico.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Sensor.webp',
+    tips:'Es el repetidor más sencillo para iniciar automatizaciones.'
+  },
+
+  {
+    id:'delay_repeater',
+    name:'Repetidor con Retardo',
+    en:'Delay Repeater',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'zinc',qty:1}
+    ],
+    desc:'Retrasa el envío de una señal durante un tiempo configurable.',
+    uses:'Temporizadores y secuencias automáticas.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Sensor.webp',
+    tips:'Ideal para sincronizar varios módulos.'
+  },
+
+  {
+    id:'count_repeater',
+    name:'Repetidor Contador',
+    en:'Count Repeater',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'zinc',qty:1}
+    ],
+    desc:'Activa una señal después de recibir un número determinado de impulsos.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Sensor.webp',
+    uses:'Contadores, ciclos automáticos y control de procesos.',
+    tips:'Muy útil junto con los sensores de almacenamiento.'
+  },
+
+  {
+    id:'proximity_repeater',
+    name:'Repetidor de Proximidad',
+    en:'Proximity Repeater',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'zinc',qty:1}
+    ],
+    desc:'Activa objetos automáticamente cuando un jugador o vehículo entra en su alcance.',
+    uses:'Puertas automáticas, luces y sistemas interactivos.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Sensor.webp',
+    tips:'También puede activar plantas y muestras de investigación.'
+  },
+
+  {
+    id:'power_switch',
+    name:'Switch de Energía',
+    en:'Power Switch',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'copper',qty:1}
+    ],
+    desc:'Permite abrir o cerrar manualmente una línea eléctrica.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Splitter.webp',
+    uses:'Aislar máquinas o activar circuitos específicos.',
+    tips:'Muy útil para apagar módulos con alto consumo.'
+  },
+
+  {
+    id:'extenders',
+    name:'Extensores',
+    en:'Extenders',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'copper',qty:1}
+    ],
+    desc:'Amplían el alcance de las conexiones de energía y oxígeno.',
+    uses:'Llevar energía a minas, estaciones ferroviarias y bases remotas.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Extenders.webp',
+    tips:'No consumen energía y son esenciales para bases grandes.'
+  },
+
+  {
+    id:'splitter',
+    name:'Divisor de Energía',
+    en:'Splitter',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'copper',qty:1},
+      {id:'graphite',qty:1}
+    ],
+    desc:'Distribuye la energía entre varias salidas.',
+    uses:'Priorizar el suministro eléctrico de determinados módulos. Permite conectar más módulos de energía o de automatización sin ranuras libres.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Splitter.webp',
+    tips:'Muy útil en bases compactas donde te falten puertos de conexión.'
+  },
+
+  {
+    id:'tapper',
+    name:'Extractor de Savia',
+    en:'Tapper',
+    cat:'automatizacion',
+    printer:'Impresora Pequeña',
+    materials:[
+      {id:'aluminum',qty:1}
+    ],
+    desc:'Recolecta automáticamente recursos orgánicos de plantas compatibles.',
+    uses:'Producción continua de recursos vegetales.',
+    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Tapper.webp',
+    tips:'Introducido en una actualización posterior como complemento de la automatización.'
+  }
 ];
 const AUTOMATION_MAP = Object.fromEntries(AUTOMATION.map(a=>[a.id,a]));
 
