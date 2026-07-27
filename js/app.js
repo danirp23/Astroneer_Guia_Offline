@@ -327,23 +327,27 @@ function renderHome(){
 }
 
 function renderAdvancedSearch(){
+  const printers = ['Todas','Mochila','Impresora Pequeña','Impresora Mediana','Impresora Grande'];
   return `
     <div class="section-head">
       <div class="section-title">🔎 Búsqueda avanzada</div>
       <div class="section-desc">Filtra los objetos imprimibles por el tipo de impresora que necesitas.</div>
     </div>
-    <div class="pill-row" style="margin-bottom:16px;">
-      ${['Todas','Mochila','Impresora Pequeña','Impresora Mediana','Impresora Grande']
-        .map(p=>`<span class="tag" style="cursor:pointer;" onclick="filterByPrinter('${p}')">${p}</span>`).join('')}
+    <div class="pill-row" id="printer-pills" style="margin-bottom:16px;">
+      ${printers.map(p=>`<span class="tag${p==='Todas'?' tag-active':''}" data-printer="${p}" style="cursor:pointer;" onclick="filterByPrinter('${p}')">${p}</span>`).join('')}
     </div>
     <div class="card-grid" id="advanced-results">${ALL_ITEMS.map(itemCard).join('')}</div>
   `;
 }
 
 function filterByPrinter(printer){
-  const el = document.getElementById('advanced-results');
+  const results = document.getElementById('advanced-results');
   const list = printer==='Todas' ? ALL_ITEMS : ALL_ITEMS.filter(it=>it.printer===printer);
-  el.innerHTML = list.map(itemCard).join('');
+  results.innerHTML = list.map(itemCard).join('');
+
+  document.querySelectorAll('#printer-pills .tag').forEach(pill=>{
+    pill.classList.toggle('tag-active', pill.dataset.printer === printer);
+  });
 }
 
 function renderResourceList(type, title, desc){
