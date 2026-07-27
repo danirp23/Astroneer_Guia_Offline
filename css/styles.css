@@ -380,3 +380,10 @@ nav.menu{display:flex;flex-direction:column;gap:2px;}
   }
   #sidebar-scrim.show{display:block;}
 }
+
+.tag.tag-active{
+  background: var(--accent);
+  color: #1a1436;
+  border-color: var(--accent);
+  font-weight: 700;
+}
