@@ -23,6 +23,22 @@
       </div>
     </div>
     <nav class="menu" id="menu"></nav>
+    <section class="theme-picker" aria-labelledby="theme-picker-title">
+      <div class="theme-picker-head">
+        <span id="theme-picker-title">Tema visual</span>
+        <span class="theme-picker-current" id="theme-picker-current">Actual</span>
+      </div>
+      <div class="theme-options" role="group" aria-label="Seleccionar tema visual">
+        <button type="button" class="theme-option" data-theme="default" data-theme-label="Actual" aria-pressed="true" onclick="setTheme('default')" title="Tema actual"><span></span><b>Actual</b></button>
+        <button type="button" class="theme-option" data-theme="sylva" data-theme-label="Sylva" aria-pressed="false" onclick="setTheme('sylva')" title="Tema Sylva"><span></span><b>Sylva</b></button>
+        <button type="button" class="theme-option" data-theme="desolo" data-theme-label="Desolo" aria-pressed="false" onclick="setTheme('desolo')" title="Tema Desolo"><span></span><b>Desolo</b></button>
+        <button type="button" class="theme-option" data-theme="calidor" data-theme-label="Calidor" aria-pressed="false" onclick="setTheme('calidor')" title="Tema Calidor"><span></span><b>Calidor</b></button>
+        <button type="button" class="theme-option" data-theme="vesania" data-theme-label="Vesania" aria-pressed="false" onclick="setTheme('vesania')" title="Tema Vesania"><span></span><b>Vesania</b></button>
+        <button type="button" class="theme-option" data-theme="novus" data-theme-label="Novus" aria-pressed="false" onclick="setTheme('novus')" title="Tema Novus"><span></span><b>Novus</b></button>
+        <button type="button" class="theme-option" data-theme="glacio" data-theme-label="Glacio" aria-pressed="false" onclick="setTheme('glacio')" title="Tema Glacio"><span></span><b>Glacio</b></button>
+        <button type="button" class="theme-option" data-theme="atrox" data-theme-label="Atrox" aria-pressed="false" onclick="setTheme('atrox')" title="Tema Atrox"><span></span><b>Atrox</b></button>
+      </div>
+    </section>
     <div id="sidebar-footer">
       Datos contrastados con la wiki oficial de Astroneer (System Era Softworks). Uso de fan no oficial.
       Astropedia es una guía creada por fans para Astroneer.

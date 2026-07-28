@@ -3,6 +3,29 @@
    ============================================================ */
 let currentSection = 'inicio';
 let favorites = new Set(JSON.parse(localStorage.getItem('astropedia_favs') || '[]'));
+const THEME_STORAGE_KEY = 'astropedia_theme';
+const THEMES = ['default','sylva','desolo','calidor','vesania','novus','glacio','atrox'];
+
+function applyTheme(theme){
+  const selected = THEMES.includes(theme) ? theme : 'default';
+  if(selected==='default') delete document.body.dataset.theme;
+  else document.body.dataset.theme = selected;
+  document.querySelectorAll('.theme-option').forEach(button=>{
+    const active = button.dataset.theme===selected;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+  const current = document.getElementById('theme-picker-current');
+  if(current) current.textContent = document.querySelector(`.theme-option[data-theme="${selected}"]`).dataset.themeLabel;
+}
+function setTheme(theme){
+  const selected = THEMES.includes(theme) ? theme : 'default';
+  localStorage.setItem(THEME_STORAGE_KEY,selected);
+  applyTheme(selected);
+}
+function initTheme(){
+  applyTheme(localStorage.getItem(THEME_STORAGE_KEY) || 'default');
+}
 
 function saveFavs(){
   localStorage.setItem('astropedia_favs', JSON.stringify([...favorites]));
@@ -764,5 +787,6 @@ window.addEventListener('scroll', ()=>{
 /* ============================================================
    INICIO
    ============================================================ */
+initTheme();
 initMenu();
 render();
