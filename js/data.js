@@ -649,51 +649,56 @@ const OBJECT_MAP = Object.fromEntries(OBJECTS.map(o=>[o.id,o]));
 /* ---------------- VEHÍCULOS ---------------- */
 const VEHICLES = [
   {id:'trailer', name:'Remolque', en:'Trailer', cat:'remolque', printer:'Impresora Pequeña',
-   materials:[{id:'aluminum',qty:1}], desc:'Remolque enganchable con ranuras extra de almacenamiento.',
-   uses:'Amplía la capacidad de carga de cualquier rover en tus expediciones.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
-   tips:'Combínalo con un Auto Arm en la base para descargar automáticamente al llegar.'},
+   materials:[{id:'compound',qty:1},{id:'aluminum',qty:1}], desc:'Remolque enganchable con una sola ranura mediana.',
+   uses:'Puede formar trenes de hasta tres remolques para ampliar la carga de un rover.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
+   tips:'No tiene ranuras de energía; añade una fuente de energía para recorridos largos.'},
   {id:'tractor', name:'Tractor', en:'Tractor', cat:'vehiculo', printer:'Impresora Pequeña', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
    materials:[{id:'aluminum',qty:2}], desc:'Rover pequeño de bajo coste, ágil en terreno irregular.',
    uses:'Ideal para exploración rápida cerca de la base antes de tener vehículos más grandes.',
-   tips:'Súbele un Small Generator o Small Wind Turbine si vas a alejarte mucho de tu base.'},
+   tips:'Añade un Generador Pequeño (Small Generator) o una Turbina Eólica Pequeña (Small Wind Turbine) para trayectos largos.'},
   {id:'medium_rover', name:'Rover Mediano', en:'Medium Rover', cat:'vehiculo', printer:'Impresora Mediana',
-   materials:[{id:'ceramic',qty:1},{id:'aluminum',qty:2}], desc:'Rover de tamaño medio con más ranuras y mejor tracción que el Buggy.',
-   uses:'Buen equilibrio entre velocidad y capacidad de carga para expediciones medias.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
-   tips:'Puedes engancharle remolques pequeños para transportar más recursos en tus rutas.'},
+   materials:[{id:'rubber',qty:1},{id:'plastic',qty:2}], desc:'Rover con una ranura grande superior y una ranura mediana en cada extremo.',
+   uses:'Puede transportar recursos y conectarse a otros rovers para formar un tren.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
+   tips:'Necesita un Asiento de Rover (Rover Seat) para conducirlo.'},
   {id:'buggy', name:'Buggy', en:'Buggy', cat:'vehiculo', printer:'Impresora Mediana',
    materials:[{id:'aluminum',qty:1},{id:'compound',qty:1}], desc:'Vehículo ligero de un asiento, rápido y con buena maniobrabilidad.',
-   uses:'Un salto de calidad respecto al Tractor para desplazarte por la base y alrededores.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
-   tips:'Añádele un Rover Seat si vas a llevar a otro astronauta contigo.'},
-  {id:'hoverboard', name:'Patineta Voladora', en:'Hoverboard', cat:'vehiculo', printer:'Impresora Mediana',
-   materials:[{id:'titanium_alloy',qty:1}], desc:'Vehículo individual que se desliza sobre el terreno sin necesidad de ruedas.',
-   uses:'Excelente para moverse rápido sobre terreno muy irregular o cuevas estrechas.',
+   uses:'Es un vehículo de exploración rápido con una ranura mediana y dos pequeñas.', icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
+   tips:'Necesita un Asiento de Rover (Rover Seat) para conducirlo; solo dispone de una ranura mediana.'},
+  {id:'hoverboard', name:'Patineta Voladora', en:'Hoverboard', cat:'vehiculo', printer:'Mochila',
+   materials:[{id:'exo_chip',qty:1}], desc:'Dispositivo personal de movilidad que se desliza sobre el terreno.',
+   uses:'Se equipa en la mochila y consume 1 U/s mientras está activo.',
    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Hoverboard.webp',
-   tips:'Consume energía de tu traje: lleva baterías o un RTG portátil si la vas a usar mucho tiempo.'},
+   tips:'Su esquema se desbloquea mediante misiones; una QT-RTG puede mantenerla activa indefinidamente.'},
   {id:'large_rover', name:'Rover Grande', en:'Large Rover', cat:'vehiculo', printer:'Impresora Grande',
-   materials:[{id:'rubber',qty:2},{id:'aluminum_alloy',qty:2}], desc:'Vehículo de varios asientos con múltiples ranuras Tier 2/3, capaz de llevar remolques largos.',
-   uses:'Un cambio radical en logística de mediados de partida: transporta impresoras y estructuras enteras.',
+   materials:[{id:'exo_chip',qty:2},{id:'aluminum_alloy',qty:1},{id:'rubber',qty:1}], desc:'Rover con una ranura extra grande superior y una ranura grande en cada extremo.',
+   uses:'Tiene el doble de capacidad de carga que el Rover Mediano y puede formar trenes de rovers.',
    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rover.webp',
-   tips:'Puedes montarle una impresora mediana encima para fabricar objetos mientras viajas.'},
+   tips:'Necesita un Asiento de Rover (Rover Seat); un Asiento de Rover Grande permite llevar más pasajeros.'},
   {id:'small_shuttle', name:'Lanzadera Pequeña', en:'Small Shuttle', cat:'vehiculo', printer:'Impresora Grande',
    materials:[{id:'aluminum',qty:2}], desc:'Tu primer vehículo espacial: te lleva a la órbita y a otros planetas.',
    uses:'Imprescindible para dejar Sylva por primera vez y empezar a explorar el sistema.',
    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Shuttle.webp',
-   tips:'Móntale un Solid-Fuel Thruster antes de despegar, y lleva otro de repuesto en la mochila.'},
+   tips:'Necesita un Propulsor de Combustible Sólido (Solid-Fuel Thruster) o un Propulsor de Hidrazina (Hydrazine Thruster).'},
   {id:'medium_shuttle', name:'Lanzadera Mediana', en:'Medium Shuttle', cat:'vehiculo', printer:'Impresora Grande',
-   materials:[{id:'ceramic',qty:2},{id:'aluminum_alloy',qty:1}], desc:'Cohete de mayor capacidad, con más ranuras de carga que la lanzadera pequeña.',
-   uses:'Permite llevar vehículos pequeños o varios silos de recursos entre planetas.',
+   materials:[{id:'ceramic',qty:2},{id:'aluminum_alloy',qty:1}], desc:'Lanzadera con cuatro ranuras medianas para propulsor, oxigenador o carga.',
+   uses:'Permite viajar entre planetas y zonas de aterrizaje del mismo planeta.',
    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Shuttle.webp',
-   tips:'Buen momento para actualizar cuando ya dependas de traer Copper o Tungsten de otro planeta.'},
+   tips:'Una de sus ranuras necesita un propulsor para despegar.'},
   {id:'large_shuttle', name:'Lanzadera Grande', en:'Large Shuttle', cat:'vehiculo', printer:'Impresora Grande',
-   materials:[{id:'ceramic',qty:2},{id:'titanium_alloy',qty:2}], desc:'El cohete de mayor capacidad, capaz de transportar rovers medianos completos.',
-   uses:'Clave para trasladar un Rover Grande o un Tren completo a otro planeta.',
+   materials:[{id:'exo_chip',qty:2},{id:'titanium_alloy',qty:1},{id:'ceramic',qty:1}], desc:'Lanzadera con dos ranuras grandes y dos medianas para módulos y carga.',
+   uses:'Permite viajar entre planetas y transportar módulos grandes.',
    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Shuttle.webp',
-   tips:'Vuela con Hydrazine Thrusters para maximizar la carga útil en cada viaje.'},
-  {id:'vtol', name:'VTOL', en:'VTOL', cat:'vehiculo', printer:'Impresora Grande',
-   materials:[{id:'titanium_alloy',qty:2},{id:'hydrazine',qty:2}], desc:'Vehículo de despegue vertical que vuela usando Hidrazina como combustible.',
+   tips:'Requiere un propulsor en una de sus ranuras medianas para despegar.'},
+  {id:'mega_mini_training_shuttle', name:'Lanzadera de Entrenamiento Mega-Mini', en:'Mega-Mini Training Shuttle', cat:'vehiculo', printer:'Impresora Grande',
+   materials:[{id:'aluminum',qty:1},{id:'iron',qty:1}], desc:'Lanzadera compacta con propulsor de hidrazina incorporado y una ranura pequeña para combustible.',
+   uses:'Permite viajar entre planetas tras desbloquear su esquema mediante misiones.',
+   icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Shuttle.webp',
+   tips:'No suministra oxígeno y solo aporta una pequeña cantidad de energía.'},
+  {id:'vtol', name:'VTOL', en:'VTOL', cat:'vehiculo', printer:'Impresora Mediana',
+   materials:[{id:'exo_chip',qty:1},{id:'tungsten_carbide',qty:1},{id:'silicone',qty:1}], desc:'Aeronave de despegue y aterrizaje vertical que usa hidrazina como combustible.',
    uses:'Perfecto para cruzar terrenos imposibles de atravesar en rover, como cañones o montañas.',
    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_VTOL.webp',
-   tips:'Lleva siempre Hidrazina de sobra: sin combustible se queda varado en pleno vuelo.'}
+   tips:'Su esquema se desbloquea mediante misiones; sin combustible desciende automáticamente al suelo.'}
 ];
 const VEHICLE_MAP = Object.fromEntries(VEHICLES.map(v=>[v.id,v]));
 
@@ -707,6 +712,13 @@ const TRAINS = [
     uses:'Permite transportar al jugador y automatizar rutas entre estaciones ferroviarias.',
     icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rail_Engine.webp',
     tips:'Puede remolcar varios vagones y dispone de asiento, luz frontal y dos ranuras auxiliares.'
+  },
+
+  {
+    id:'cole', name:'C.O.L.E.', en:'C.O.L.E.', cat:'tren', printer:'Recompensa de misión', materials:[],
+    desc:'Locomotora logística operada por ordenador, con asiento integrado y dos ranuras pequeñas.',
+    uses:'Transporta al jugador y puede llevar hasta cinco vagones o locomotoras adicionales.',
+    tips:'No se fabrica: se obtiene al completar la misión Travelling Companion y puede reclamarse de nuevo si se pierde.'
   },
 
   {
@@ -753,7 +765,7 @@ const TRAINS = [
     desc:'Contiene 5 desvíos ferroviarios.',
     uses:'Permite dividir una vía en tres direcciones diferentes.',
     icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Rail_Post.webp',
-    tips:'Puedes controlar automáticamente la dirección mediante pines y sensores.'
+    tips:'Puedes controlar automáticamente la dirección mediante señales de automatización y sensores.'
   }
 ];
 const TRAIN_MAP = Object.fromEntries(TRAINS.map(t=>[t.id,t]));
@@ -784,7 +796,7 @@ const AUTOMATION = [
     cat:'automatizacion',
     printer:'Impresora Grande',
     materials:[
-      {id:'steel',qty:2},
+      {id:'steel',qty:1},
       {id:'tungsten_carbide',qty:1},
       {id:'rubber',qty:1},
       {id:'exo_chip',qty:1},
@@ -919,21 +931,6 @@ const AUTOMATION = [
   },
 
   {
-    id:'extenders',
-    name:'Extensores',
-    en:'Extenders',
-    cat:'automatizacion',
-    printer:'Impresora Pequeña',
-    materials:[
-      {id:'copper',qty:1}
-    ],
-    desc:'Amplían el alcance de las conexiones de energía y oxígeno.',
-    uses:'Llevar energía a minas, estaciones ferroviarias y bases remotas.',
-    icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Extenders.webp',
-    tips:'No consumen energía y son esenciales para bases grandes.'
-  },
-
-  {
     id:'splitter',
     name:'Divisor de Energía',
     en:'Splitter',
@@ -954,14 +951,78 @@ const AUTOMATION = [
     name:'Extractor de Savia',
     en:'Tapper',
     cat:'automatizacion',
-    printer:'Impresora Pequeña',
+    printer:'Mochila',
     materials:[
       {id:'aluminum',qty:1}
     ],
-    desc:'Recolecta automáticamente recursos orgánicos de plantas compatibles.',
-    uses:'Producción continua de recursos vegetales.',
+    desc:'Genera recursos de flora compatible de forma automática.',
+    uses:'Produce Orgánico y otros recursos según la planta donde se instale.',
     icon:'https://danirp23.github.io/Astroneer_Guia_Offline/assets/objects/Icon_Tapper.png',
-    tips:'Introducido en una actualización posterior como complemento de la automatización.'
+    tips:'No consume energía; varios extractores en una planta comparten la producción.'
+  },
+
+  {
+    id:'medium_sensor_arch', name:'Arco Sensor Mediano', en:'Medium Sensor Arch', cat:'automatizacion', printer:'Impresora Grande',
+    materials:[{id:'zinc',qty:1},{id:'quartz',qty:1}],
+    desc:'Arco sensor que activa sus ranuras de reacción cuando un jugador u objeto pasa por él.',
+    uses:'Activa objetos cercanos o conectados mediante señales de automatización.',
+    tips:'Dispone de seis ranuras de reacción para activar objetos al atravesar el arco.'
+  },
+
+  {
+    id:'xl_sensor_arch', name:'Arco Sensor XL', en:'XL Sensor Arch', cat:'automatizacion', printer:'Impresora Grande',
+    materials:[{id:'zinc',qty:2},{id:'quartz',qty:2}],
+    desc:'Arco sensor extra grande que detecta el paso de jugadores, vehículos u objetos.',
+    uses:'Activa ranuras de reacción y objetivos conectados cuando detecta un paso.',
+    tips:'Puede utilizarse para detectar el aterrizaje de una lanzadera.'
+  },
+
+  {
+    id:'xl_sensor_canopy', name:'Canopia Sensor XL', en:'XL Sensor Canopy', cat:'automatizacion', printer:'Impresora Grande',
+    materials:[{id:'zinc',qty:2},{id:'quartz',qty:2}],
+    desc:'Sensor extra grande que se activa cuando algo atraviesa su barrera de detección.',
+    uses:'Activa objetos en sus ranuras de reacción o conectados a sus pines.',
+    tips:'Tiene seis ranuras medianas para almacenar objetos como fuegos artificiales.'
+  },
+
+  {
+    id:'large_sensor_ring', name:'Anillo Sensor Grande', en:'Large Sensor Ring', cat:'automatizacion', printer:'Impresora Grande',
+    materials:[{id:'zinc',qty:1},{id:'quartz',qty:1}],
+    desc:'Anillo sensor que activa objetos cuando un jugador u objeto pasa por su zona.',
+    uses:'Permite crear activaciones por paso en bases o circuitos de recreación.',
+    tips:'Usa sus ranuras de reacción para activar objetos sin conectarlos por cable.'
+  },
+
+  {
+    id:'large_sensor_hoop_a', name:'Aro Sensor Grande A', en:'Large Sensor Hoop A', cat:'automatizacion', printer:'Impresora Grande',
+    materials:[{id:'zinc',qty:1},{id:'quartz',qty:2}],
+    desc:'Aro sensor que activa objetos al detectar el paso por su zona.',
+    uses:'Permite automatizar luces, fuegos artificiales u objetivos conectados.',
+    tips:'Combínalo con una Esfera Recreativa (Recreational Sphere) para juegos o circuitos.'
+  },
+
+  {
+    id:'large_sensor_hoop_b', name:'Aro Sensor Grande B', en:'Large Sensor Hoop B', cat:'automatizacion', printer:'Impresora Grande',
+    materials:[{id:'zinc',qty:2},{id:'quartz',qty:1}],
+    desc:'Aro sensor que activa objetos al detectar el paso por su zona.',
+    uses:'Permite automatizar luces, fuegos artificiales u objetivos conectados.',
+    tips:'Cuenta con dos ranuras medianas y seis ranuras pequeñas de reacción.'
+  },
+
+  {
+    id:'xl_sensor_hoop_a', name:'Aro Sensor XL A', en:'XL Sensor Hoop A', cat:'automatizacion', printer:'Impresora Grande',
+    materials:[{id:'zinc',qty:2},{id:'quartz',qty:2}],
+    desc:'Aro sensor extra grande que detecta jugadores, vehículos u objetos al atravesarlo.',
+    uses:'Activa sus ranuras de reacción y objetivos conectados mediante señales.',
+    tips:'Puede utilizarse para detectar el aterrizaje de una lanzadera.'
+  },
+
+  {
+    id:'xl_sensor_hoop_b', name:'Aro Sensor XL B', en:'XL Sensor Hoop B', cat:'automatizacion', printer:'Impresora Grande',
+    materials:[{id:'zinc',qty:3},{id:'quartz',qty:1}],
+    desc:'Aro sensor extra grande que detecta jugadores, vehículos u objetos al atravesarlo.',
+    uses:'Activa sus ranuras de reacción y objetivos conectados mediante señales.',
+    tips:'Puede utilizarse para detectar el aterrizaje de una lanzadera.'
   }
 ];
 const AUTOMATION_MAP = Object.fromEntries(AUTOMATION.map(a=>[a.id,a]));
