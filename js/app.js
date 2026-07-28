@@ -64,8 +64,7 @@ function initMenu(){
     {id:'Estación de tren', label:SECTIONS_CONFIG.estacion_tren.label, icon:SECTIONS_CONFIG.estacion_tren.icon},
     {id:'automatizacion', label:SECTIONS_CONFIG.automatizacion.label, icon:SECTIONS_CONFIG.automatizacion.icon},
     {id:'favoritos', label:'Favoritos', icon:'⭐'},
-    {id:'planetas', label:SECTIONS_CONFIG.planetas.label, icon:SECTIONS_CONFIG.planetas.icon},
-    {id:'tecnologia', label:SECTIONS_CONFIG.arbol_tecnologico.label, icon:SECTIONS_CONFIG.arbol_tecnologico.icon}
+    {id:'planetas', label:SECTIONS_CONFIG.planetas.label, icon:SECTIONS_CONFIG.planetas.icon}
   ];
 }
 
@@ -127,11 +126,6 @@ const SECTIONS_CONFIG = {
     icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp',
     label: 'Planetas',
     description: 'Cinco planetas y dos lunas conforman el sistema de Astroneer. Cada uno destaca por recursos representativos y una combinación única de gases.'
-  },
-  arbol_tecnologico: {
-    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/tree-fam.png',
-    label: 'Árbol tecnológico',
-    description: 'Progresión aproximada de investigación: cada nivel se apoya en los materiales desbloqueados en el anterior. Los Bytes se consiguen investigando recursos y objetos de exploración en la Cámara de Investigación.'
   }
 };
 
@@ -299,11 +293,6 @@ function render(){
     case 'planetas': {
       const cfg = SECTIONS_CONFIG.planetas;
       c.innerHTML =renderPlanets(makeIconHtml(cfg.icon, cfg.label), cfg.description)
-      break;
-    }
-    case 'tecnologia':{
-      const cfg = SECTIONS_CONFIG.arbol_tecnologico;
-      c.innerHTML = renderTechTree(makeIconHtml(cfg.icon, cfg.label), cfg.description);
       break;
     }
     default: c.innerHTML = renderHome();
@@ -474,30 +463,6 @@ function renderPlanets(titleHtml, description){
           <h3>${p.icon ? `<img src="${p.icon}" alt="${p.name}" style="width:32px;height:32px;object-fit:contain;vertical-align:middle;margin-right:8px;">` : ''}<span>${p.name}</span></h3>
           <div class="sub">${p.level}</div>
           <div class="diff-row">${Array.from({length:5}).map((_,i)=>`<span class="diff-dot ${i<p.difficulty?'on':''}"></span>`).join('')}</div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-}
-
-function renderTechTree(titleHtml, description){
-  const tiers = [
-    {name:'Nivel 1 · Supervivencia básica', items:['Herramienta de Terreno','Cable de Oxígeno','Tanque de Oxígeno','Generador Pequeño','Impresora Pequeña'], cost:'Gratis / inicial'},
-    {name:'Nivel 2 · Primeras estructuras', items:['Horno de Fundición','Impresora Mediana','Almacenamiento Mediano','Plataforma de Intercambio','Cámara de Investigación'], cost:'Bytes bajos'},
-    {name:'Nivel 3 · Química y automatización', items:['Laboratorio de Química','Condensador Atmosférico','Brazo Automático','Silo de Almacenamiento Mediano'], cost:'~1600 Bytes (Laboratorio de Química)'},
-    {name:'Nivel 4 · Vehículos y expansión', items:['Rover','Tractor','Rover Grande','Impresora Grande','Trituradora Grande'], cost:'Bytes medios'},
-    {name:'Nivel 5 · Endgame', items:['Aleación de Nanocarbón','VTOL','Locomotora','Extractor Automático'], cost:'Bytes altos + recursos avanzados'}
-  ];
-  return `
-    <div class="section-head">
-      <div class="section-title">${titleHtml}</div>
-      <div class="section-desc">${description}</div>
-    </div>
-    <div class="card-grid" style="grid-template-columns:1fr;">
-      ${tiers.map((t,i)=>`
-        <div class="panel">
-          <h3>${i+1}. ${t.name} <span class="tag" style="margin-left:auto;">${t.cost}</span></h3>
-          <div class="pill-row">${t.items.map(x=>`<span class="pill">${x}</span>`).join('')}</div>
         </div>
       `).join('')}
     </div>
