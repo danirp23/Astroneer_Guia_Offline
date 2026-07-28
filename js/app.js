@@ -34,6 +34,7 @@ function initMenu(){
     {id:'refinados', label:SECTIONS_CONFIG.refinados.label, icon:SECTIONS_CONFIG.refinados.icon},
     //{id:'compuestos', label:'Recursos compuestos', icon:''},
     {id:'gases', label:SECTIONS_CONFIG.gases.label, icon:SECTIONS_CONFIG.gases.icon},
+    {id:'especiales', label:SECTIONS_CONFIG.especiales.label, icon:SECTIONS_CONFIG.especiales.icon},
     {id:'quimica', label:SECTIONS_CONFIG.quimica.label, icon:SECTIONS_CONFIG.quimica.icon},
     {id:'objetos', label:SECTIONS_CONFIG.objetos.label, icon:SECTIONS_CONFIG.objetos.icon},
     {id:'vehiculos', label:SECTIONS_CONFIG.vehiculos.label, icon:SECTIONS_CONFIG.vehiculos.icon},
@@ -69,10 +70,15 @@ const SECTIONS_CONFIG = {
     label: 'Gases',
     description: 'Recursos atmosféricos recolectados con el Condensador Atmosférico; su disponibilidad varía por planeta.'
   },
+  especiales: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/resources/Icon_EXO_Chip.webp',
+    label: 'Recursos especiales',
+    description: 'Recursos que no pertenecen a las categorías naturales, refinadas, atmosféricas o compuestas.'
+  },
   quimica: {
     icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Chemistry_Lab.webp',
     label: 'Laboratorio de química',
-    description: 'El Chemistry Lab combina dos (o tres) recursos —a veces con un gas de por medio— para crear los materiales más avanzados del juego. Pulsa cualquier compuesto para ver su árbol de fabricación completo.'
+    description: 'El Laboratorio Químico combina dos o tres recursos —a veces con un gas— para crear recursos compuestos. Pulsa cualquier compuesto para ver su árbol de fabricación completo.'
   },
   objetos: {
     icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/Icon_Tier_Large.webp',
@@ -97,7 +103,7 @@ const SECTIONS_CONFIG = {
   planetas: {
     icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp',
     label: 'Planetas',
-    description: 'Cinco planetas y dos lunas conforman el sistema de Astroneer. Cada uno tiene recursos primarios, secundarios y una combinación única de gases.'
+    description: 'Cinco planetas y dos lunas conforman el sistema de Astroneer. Cada uno destaca por recursos representativos y una combinación única de gases.'
   },
   arbol_tecnologico: {
     icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/tree-fam.png',
@@ -112,6 +118,7 @@ function countFor(id){
     case 'refinados': return RESOURCES.filter(r=>r.type==='refined').length;
     case 'compuestos': return RESOURCES.filter(r=>r.type==='composite').length;
     case 'gases': return RESOURCES.filter(r=>r.type==='gas').length;
+    case 'especiales': return RESOURCES.filter(r=>r.type==='special').length;
     case 'quimica': return RESOURCES.filter(r=>r.type==='composite').length;
     case 'objetos': return OBJECTS.length;
     case 'vehiculos': return VEHICLES.length;
@@ -158,7 +165,7 @@ function iconCircle(color, icon, size){
   return `<div class="res-icon" style="width:${sz}px;height:${sz}px;background:linear-gradient(150deg, ${color}33, ${color}14); color:${color}; box-shadow:inset 0 0 0 1px ${color}44;">${iconContent}</div>`;
 }
 function typeLabel(t){
-  return {natural:'Natural', refined:'Refinado', gas:'Gas', composite:'Compuesto'}[t] || t;
+  return {natural:'Natural', refined:'Refinado', gas:'Gas', composite:'Compuesto', special:'Especial'}[t] || t;
 }
 function planetName(id){ return PLANET_MAP[id] ? PLANET_MAP[id].name : id; }
 
@@ -235,6 +242,11 @@ function render(){
       c.innerHTML = renderResourceList('gas', makeIconHtml(cfg.icon, cfg.label), cfg.description);
       break;
     }
+    case 'especiales': {
+      const cfg = SECTIONS_CONFIG.especiales;
+      c.innerHTML = renderResourceList('special', makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      break;
+    }
     case 'quimica': {
       const cfg = SECTIONS_CONFIG.quimica;
       c.innerHTML = renderChemistry(makeIconHtml(cfg.icon, cfg.label), cfg.description);
@@ -281,6 +293,7 @@ function renderHome(){
     {n: RESOURCES.filter(r=>r.type==='refined').length, l:'Recursos refinados'},
     {n: RESOURCES.filter(r=>r.type==='composite').length, l:'Compuestos'},
     {n: RESOURCES.filter(r=>r.type==='gas').length, l:'Gases'},
+    {n: RESOURCES.filter(r=>r.type==='special').length, l:'Recursos especiales'},
     {n: OBJECTS.length, l:'Objetos / plataformas'},
     {n: VEHICLES.length + TRAINS.length, l:'Vehículos y trenes'},
     {n: AUTOMATION.length, l:'Piezas de automatización'},
@@ -602,10 +615,32 @@ function openItem(id){
   document.getElementById('overlay').classList.add('show');
 }
 
+function planetResourceChip(r){
+  return `<span class="planet-resource-chip" onclick="openResource('${r.id}')">
+    ${r.icon.startsWith('http') ? `<img src="${r.icon}" alt="${r.name}">` : `<span class="planet-resource-fallback">${r.icon}</span>`}
+    <span>${r.name} <em>(${r.en})</em></span>
+  </span>`;
+}
+
+function togglePlanetResources(button){
+  const target=document.getElementById(button.getAttribute('aria-controls'));
+  if(!target) return;
+  const expanded=button.getAttribute('aria-expanded') === 'true';
+  const next=!expanded;
+  const text=next ? 'Ocultar todos los recursos' : 'Ver todos los recursos disponibles';
+  button.setAttribute('aria-expanded', String(next));
+  button.setAttribute('aria-label', text);
+  button.querySelector('.planet-resource-toggle-icon').textContent=next ? '▾' : '▸';
+  button.querySelector('.planet-resource-toggle-text').textContent=text;
+  target.classList.toggle('open', next);
+}
+
 function openPlanet(id){
   const p = PLANET_MAP[id];
   if(!p) return;
-  const exclusiveResources = RESOURCES.filter(r=>r.found && r.found.length && r.found.every(f=>f===id) && r.found.length===1);
+  const mainResources = (p.mainResources || []).map(resourceId=>RESOURCE_MAP[resourceId]).filter(Boolean);
+  const additionalResources = RESOURCES.filter(r=>r.type==='natural' && r.found.includes(id) && !mainResources.some(main=>main.id===r.id));
+  const allResourcesId=`planet-all-resources-${p.id}`;
   const html = `
     <div class="detail-head" style="background:linear-gradient(160deg, ${p.color}22, transparent);">
       <div class="detail-icon" style="background:${p.color}22; color:${p.color};">${p.icon ? `<img src="${p.icon}" alt="${p.name}" style="width:60px;height:60px;object-fit:contain;">` : ''}</div>
@@ -622,8 +657,19 @@ function openPlanet(id){
         <div class="kv-grid">
           <div class="kv"><div class="k">Dificultad</div><div class="v">${'●'.repeat(p.difficulty)}${'○'.repeat(5-p.difficulty)}</div></div>
           <div class="kv"><div class="k">Nivel recomendado</div><div class="v">${p.level}</div></div>
-          <div class="kv"><div class="k">Recurso primario</div><div class="v">${p.primary}</div></div>
-          <div class="kv"><div class="k">Recurso secundario</div><div class="v">${p.secondary}</div></div>
+        </div>
+      </div>
+      <div class="dsec">
+        <h4>Recursos principales</h4>
+        <div class="planet-resource-list">${mainResources.length ? mainResources.map(planetResourceChip).join('') : '<span class="planet-resource-empty">No posee minerales específicos destacados</span>'}</div>
+        <button class="planet-resource-toggle" type="button" aria-expanded="false" aria-controls="${allResourcesId}" aria-label="Ver todos los recursos disponibles" onclick="togglePlanetResources(this)">
+          <span class="planet-resource-toggle-icon" aria-hidden="true">▸</span>
+          <span class="planet-resource-toggle-text">Ver todos los recursos disponibles</span>
+        </button>
+        <div class="planet-all-resources" id="${allResourcesId}" role="region" aria-label="Todos los recursos naturales disponibles en ${p.name}">
+          <div class="planet-all-resources-inner">
+            <div class="planet-resource-list">${additionalResources.length ? additionalResources.map(planetResourceChip).join('') : '<span class="planet-resource-empty">No hay recursos naturales adicionales registrados</span>'}</div>
+          </div>
         </div>
       </div>
       <div class="dsec">

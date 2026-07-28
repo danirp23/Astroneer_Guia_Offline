@@ -296,6 +296,28 @@ nav.menu{display:flex;flex-direction:column;gap:2px;}
 }
 .pill:hover{border-color:var(--accent-dim);color:var(--accent-2);}
 .pill .qty{color:var(--accent-2);font-weight:700;}
+.planet-resource-list{display:flex;flex-wrap:wrap;gap:8px;}
+.planet-resource-chip{
+  display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:7px 11px;
+  background:linear-gradient(135deg, var(--panel-2), var(--bg-soft));border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s;
+}
+.planet-resource-chip:hover{border-color:var(--accent-dim);color:var(--accent-2);}
+.planet-resource-chip img{width:25px;height:25px;object-fit:contain;flex-shrink:0;}
+.planet-resource-chip em{font-style:normal;font-size:11px;font-weight:500;color:var(--text-faint);}
+.planet-resource-fallback{font-size:18px;line-height:1;}
+.planet-resource-empty{padding:9px 12px;border:1px dashed var(--border);border-radius:var(--radius-sm);color:var(--text-faint);font-size:12.5px;}
+.planet-resource-toggle{
+  display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:5px 2px;background:transparent;border:0;
+  border-top:1px solid var(--border-soft);color:var(--text-dim);font:inherit;font-size:12px;cursor:pointer;
+}
+.planet-resource-toggle:hover{color:var(--accent-2);}
+.planet-resource-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px;}
+.planet-resource-toggle-icon{width:12px;color:var(--accent);font-size:13px;}
+.planet-all-resources{display:grid;grid-template-rows:0fr;transition:grid-template-rows .2s ease;}
+.planet-all-resources.open{grid-template-rows:1fr;}
+.planet-all-resources-inner{min-height:0;overflow:hidden;padding-top:0;transition:padding-top .2s ease;}
+.planet-all-resources.open .planet-all-resources-inner{padding-top:8px;}
 .method-flags{display:flex;gap:8px;flex-wrap:wrap;}
 .mflag{font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);color:var(--text-faint);}
 .mflag.yes{color:var(--green);border-color:rgba(107,220,156,.3);background:rgba(107,220,156,.06);}
