@@ -64,7 +64,8 @@ function initMenu(){
     {id:'Estación de tren', label:SECTIONS_CONFIG.estacion_tren.label, icon:SECTIONS_CONFIG.estacion_tren.icon},
     {id:'automatizacion', label:SECTIONS_CONFIG.automatizacion.label, icon:SECTIONS_CONFIG.automatizacion.icon},
     {id:'favoritos', label:'Favoritos', icon:'⭐'},
-    {id:'planetas', label:SECTIONS_CONFIG.planetas.label, icon:SECTIONS_CONFIG.planetas.icon}
+    {id:'planetas', label:SECTIONS_CONFIG.planetas.label, icon:SECTIONS_CONFIG.planetas.icon},
+    {id:'arbol_recursos', label:SECTIONS_CONFIG.arbol_recursos.label, icon:SECTIONS_CONFIG.arbol_recursos.icon}
   ];
 }
 
@@ -126,6 +127,11 @@ const SECTIONS_CONFIG = {
     icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/planets/Icon_Sylva.webp',
     label: 'Planetas',
     description: 'Cinco planetas y dos lunas conforman el sistema de Astroneer. Cada uno destaca por recursos representativos y una combinación única de gases.'
+  },
+  arbol_recursos: {
+    icon: 'https://danirp23.github.io/Astroneer_Guia_Offline/assets/menu/tree-fam.png',
+    label: 'Árbol de recursos',
+    description: 'Explora cómo se obtienen, refinan y combinan los recursos de Astroneer.'
   }
 };
 
@@ -234,6 +240,7 @@ function makeIconHtml(icon, label){
    RENDER: secciones principales
    ============================================================ */
 function render(){
+  if(window.resourceTreeCy){ window.resourceTreeCy.destroy(); window.resourceTreeCy = null; }
   buildMenu();
   const c = document.getElementById('content');
   switch(currentSection){
@@ -293,6 +300,12 @@ function render(){
     case 'planetas': {
       const cfg = SECTIONS_CONFIG.planetas;
       c.innerHTML =renderPlanets(makeIconHtml(cfg.icon, cfg.label), cfg.description)
+      break;
+    }
+    case 'arbol_recursos': {
+      const cfg = SECTIONS_CONFIG.arbol_recursos;
+      c.innerHTML = renderResourceTree(makeIconHtml(cfg.icon, cfg.label), cfg.description);
+      initResourceTree();
       break;
     }
     default: c.innerHTML = renderHome();
@@ -467,6 +480,212 @@ function renderPlanets(titleHtml, description){
       `).join('')}
     </div>
   `;
+}
+
+/* ============================================================
+   ÁRBOL DE RECURSOS: prueba visual basada en recetas reales
+   ============================================================ */
+const RESOURCE_TREE_OUTPUTS = [
+  'carbon','glass','tungsten','ceramic','iron','copper','aluminum','titanium','zinc',
+  'silicone','rubber','plastic','explosive_powder','steel','tungsten_carbide','aluminum_alloy',
+  'hydrazine','graphene','diamond','titanium_alloy','nanocarbon_alloy'
+];
+
+function resourceTreeIds(){
+  const ids = new Set();
+  const addWithIngredients = id=>{
+    if(ids.has(id) || !RESOURCE_MAP[id]) return;
+    ids.add(id);
+    (RESOURCE_MAP[id].recipe || []).forEach(ingredient=>addWithIngredients(ingredient.id));
+  };
+  RESOURCE_TREE_OUTPUTS.forEach(addWithIngredients);
+  return [...ids];
+}
+
+function resourceTreeMethod(resource){
+  return {natural:'Minería', refined:'Fundición', gas:'Condensador atmosférico', composite:'Laboratorio de química'}[resource.type] || 'Recurso especial';
+}
+
+function resourceTreePositions(resources){
+  const positions = {};
+  const sourceY = {};
+  const naturals = resources.filter(resource=>resource.type==='natural').sort((a,b)=>a.name.localeCompare(b.name,'es'));
+  const gases = resources.filter(resource=>resource.type==='gas').sort((a,b)=>a.name.localeCompare(b.name,'es'));
+  naturals.forEach((resource,index)=>{
+    const column = index<7 ? 110 : 315;
+    const y = 92 + (index%7)*82;
+    positions[resource.id] = {x:column,y}; sourceY[resource.id] = y;
+  });
+  gases.forEach((resource,index)=>{
+    const y = 680 + index*82;
+    positions[resource.id] = {x:315,y}; sourceY[resource.id] = y;
+  });
+  resources.filter(resource=>resource.type==='refined').forEach(resource=>{
+    const ingredient = resource.recipe && resource.recipe[0];
+    positions[resource.id] = {x:550,y:sourceY[ingredient && ingredient.id] || 92};
+  });
+  const chemistryStages = {
+    rubber:2, plastic:2, aluminum_alloy:2, tungsten_carbide:2, hydrazine:2, silicone:2, explosive_powder:2, steel:2,
+    graphene:3, diamond:4, titanium_alloy:4, nanocarbon_alloy:5
+  };
+  [2,3,4,5].forEach(stage=>{
+    resources.filter(resource=>chemistryStages[resource.id]===stage).sort((a,b)=>a.name.localeCompare(b.name,'es')).forEach((resource,index)=>{
+      positions[resource.id] = {x:770+(stage-2)*240,y:92+index*86};
+    });
+  });
+  return positions;
+}
+
+function renderResourceTree(titleHtml, description){
+  return `
+    <div class="section-head">
+      <div class="section-title">${titleHtml}</div>
+      <div class="section-desc">${description}</div>
+    </div>
+    <div class="resource-tree-controls" aria-label="Controles del árbol de recursos">
+      <div class="resource-tree-filters" role="group" aria-label="Filtrar recursos por método">
+        <button type="button" class="chip active" data-tree-filter="all" aria-pressed="true" onclick="applyResourceTreeFilter('all',this)">Todos</button>
+        <button type="button" class="chip" data-tree-filter="natural" aria-pressed="false" onclick="applyResourceTreeFilter('natural',this)">Minería</button>
+        <button type="button" class="chip" data-tree-filter="refined" aria-pressed="false" onclick="applyResourceTreeFilter('refined',this)">Fundición</button>
+        <button type="button" class="chip" data-tree-filter="gas" aria-pressed="false" onclick="applyResourceTreeFilter('gas',this)">Gases</button>
+        <button type="button" class="chip" data-tree-filter="composite" aria-pressed="false" onclick="applyResourceTreeFilter('composite',this)">Laboratorio de química</button>
+      </div>
+      <label class="resource-tree-search"><span>⌕</span><input id="resource-tree-search" type="search" placeholder="Buscar recurso..." aria-label="Buscar recurso por nombre en español o inglés" oninput="resourceTreeSearch(this.value)"></label>
+      <div class="resource-tree-view-controls">
+        <button type="button" class="btn-ghost" aria-label="Centrar árbol de recursos" onclick="resourceTreeCenter()">⊙ Centrar</button>
+        <button type="button" class="btn-ghost" aria-label="Restablecer zoom y selección" onclick="resourceTreeReset()">↺ Restablecer</button>
+      </div>
+    </div>
+    <div class="resource-tree-flow" aria-label="Dirección del flujo de recetas: recursos de origen, fundición y química">
+      <span>Origen <small>Naturales y gases</small></span><b>→</b><span>Fundición <small>Recursos refinados</small></span><b>→</b><span>Química básica</span><b>→</b><span>Química avanzada</span>
+    </div>
+    <div class="resource-tree-layout">
+      <div class="resource-tree-graph-wrap"><div id="resource-tree-graph" role="application" aria-label="Grafo interactivo de recetas de recursos. Selecciona un recurso para ver sus relaciones."></div></div>
+      <aside class="resource-tree-detail" id="resource-tree-detail" aria-live="polite">
+        <div class="resource-tree-detail-empty"><span>✦</span><strong>Selecciona un recurso</strong><p>Verás su método, ingredientes, productos relacionados y planetas disponibles.</p></div>
+      </aside>
+    </div>
+  `;
+}
+
+function initResourceTree(){
+  const container = document.getElementById('resource-tree-graph');
+  if(!container) return;
+  if(!window.cytoscape){
+    container.innerHTML = '<p class="resource-tree-error">No se pudo cargar el grafo. Comprueba tu conexión e inténtalo de nuevo.</p>';
+    return;
+  }
+  const ids = resourceTreeIds();
+  const resources = ids.map(id=>RESOURCE_MAP[id]).filter(Boolean);
+  const positions = resourceTreePositions(resources);
+  const accent = getComputedStyle(document.body).getPropertyValue('--accent-2').trim() || '#ffb066';
+  const elements = [
+    ...resources.map(resource=>({data:{id:resource.id, label:`${resource.name}\n${resource.en}`, icon:resource.icon, color:resource.color, type:resource.type}, position:positions[resource.id]})),
+    ...resources.flatMap(resource=>(resource.recipe || []).filter(ingredient=>ids.includes(ingredient.id)).map(ingredient=>({data:{id:`${ingredient.id}-${resource.id}`, source:ingredient.id, target:resource.id, qty:ingredient.qty>1 ? `${ingredient.qty}×` : ''}})))
+  ];
+  const cy = window.cytoscape({
+    container,
+    elements,
+    style:[
+      {selector:'node', style:{'width':174,'height':64,'shape':'round-rectangle','background-color':'#221c45','background-image':'data(icon)','background-fit':'contain','background-width':38,'background-height':38,'background-position-x':'16px','background-position-y':'50%','border-width':2,'border-color':'data(color)','label':'data(label)','font-family':'Segoe UI, sans-serif','font-size':10.5,'font-weight':700,'color':'#f5eeff','text-wrap':'wrap','text-max-width':96,'text-halign':'center','text-justification':'left','text-valign':'center','text-margin-x':28,'text-outline-width':0}},
+      {selector:'node[type="natural"]', style:{'background-color':'#273c35'}},
+      {selector:'node[type="refined"]', style:{'background-color':'#303044'}},
+      {selector:'node[type="gas"]', style:{'background-color':'#20384d'}},
+      {selector:'node[type="composite"]', style:{'background-color':'#3b2d50'}},
+      {selector:'edge', style:{'width':2.5,'line-color':accent,'target-arrow-color':accent,'target-arrow-shape':'triangle','arrow-scale':1.1,'curve-style':'bezier','opacity':.76,'label':'data(qty)','font-size':10,'font-weight':700,'color':'#f5eeff','text-background-color':'#1a1436','text-background-opacity':1,'text-background-padding':2}},
+      {selector:'.tree-dim', style:{'opacity':.15}},
+      {selector:'.tree-selected', style:{'border-width':4,'border-color':'#ffb066','overlay-color':'#ff8a3d','overlay-opacity':.18,'overlay-padding':8}},
+      {selector:'.tree-hidden', style:{'display':'none'}}
+    ],
+    wheelSensitivity:.18,
+    minZoom:.35,
+    maxZoom:2.2,
+    boxSelectionEnabled:false
+  });
+  window.resourceTreeCy = cy;
+  window.resourceTreeIds = ids;
+  cy.layout({name:'preset', fit:false, padding:44, animate:false}).run();
+  cy.zoom(.72); cy.pan({x:28,y:38});
+  cy.on('tap','node',event=>selectResourceTreeNode(event.target));
+  cy.on('tap',event=>{ if(event.target===cy) clearResourceTreeSelection(); });
+}
+
+function selectResourceTreeNode(node){
+  const cy = window.resourceTreeCy;
+  if(!cy || !node) return;
+  const related = node.closedNeighborhood();
+  cy.elements().addClass('tree-dim').removeClass('tree-selected');
+  related.removeClass('tree-dim');
+  node.addClass('tree-selected');
+  renderResourceTreeDetail(RESOURCE_MAP[node.id()], cy);
+}
+
+function clearResourceTreeSelection(){
+  const cy = window.resourceTreeCy;
+  if(!cy) return;
+  cy.elements().removeClass('tree-dim tree-selected');
+  const detail = document.getElementById('resource-tree-detail');
+  if(detail) detail.innerHTML = '<div class="resource-tree-detail-empty"><span>✦</span><strong>Selecciona un recurso</strong><p>Verás su método, ingredientes, productos relacionados y planetas disponibles.</p></div>';
+}
+
+function renderResourceTreeDetail(resource, cy){
+  const detail = document.getElementById('resource-tree-detail');
+  if(!detail || !resource) return;
+  const ingredients = (resource.recipe || []).map(ingredient=>{
+    const item = RESOURCE_MAP[ingredient.id];
+    return item ? `<button type="button" class="resource-tree-link" onclick="selectResourceTreeNode(window.resourceTreeCy.$id('${item.id}'))">${ingredient.qty}× ${item.name}</button>` : '';
+  }).join('') || '<span class="resource-tree-muted">No requiere ingredientes.</span>';
+  const products = cy.$id(resource.id).outgoers('node').map(node=>RESOURCE_MAP[node.id()]).filter(Boolean).map(item=>`<button type="button" class="resource-tree-link" onclick="selectResourceTreeNode(window.resourceTreeCy.$id('${item.id}'))">${item.name}</button>`).join('') || '<span class="resource-tree-muted">Sin productos dentro de esta prueba.</span>';
+  const planets = (resource.found || []).map(id=>PLANET_MAP[id] ? `<span class="resource-tree-planet">${PLANET_MAP[id].name}</span>` : '').join('') || '<span class="resource-tree-muted">No se obtiene en planetas.</span>';
+  const icon = resource.icon && resource.icon.startsWith('http') ? `<img src="${resource.icon}" alt="">` : '<span>◆</span>';
+  detail.innerHTML = `
+    <div class="resource-tree-detail-head"><div class="resource-tree-detail-icon" style="--resource-color:${resource.color}">${icon}</div><div><h3>${resource.name}</h3><p>${resource.en}</p></div></div>
+    <span class="resource-tree-type ${resource.type}">${typeLabel(resource.type)} · ${resourceTreeMethod(resource)}</span>
+    <p class="resource-tree-obtain">${resource.obtain}</p>
+    <section><h4>Ingredientes</h4><div class="resource-tree-link-list">${ingredients}</div></section>
+    <section><h4>Productos relacionados</h4><div class="resource-tree-link-list">${products}</div></section>
+    <section><h4>Planetas</h4><div class="resource-tree-planets">${planets}</div></section>`;
+}
+
+function applyResourceTreeFilter(filter, button){
+  const cy = window.resourceTreeCy;
+  if(!cy) return;
+  clearResourceTreeSelection();
+  cy.elements().removeClass('tree-hidden');
+  if(filter!=='all'){
+    cy.nodes().filter(node=>node.data('type')!==filter).addClass('tree-hidden');
+    cy.edges().filter(edge=>edge.source().hasClass('tree-hidden') || edge.target().hasClass('tree-hidden')).addClass('tree-hidden');
+  }
+  document.querySelectorAll('[data-tree-filter]').forEach(control=>{
+    const active = control.dataset.treeFilter===filter;
+    control.classList.toggle('active',active);
+    control.setAttribute('aria-pressed',String(active));
+  });
+  if(button) button.focus();
+  cy.fit(cy.elements(':visible'),44);
+}
+
+function resourceTreeSearch(query){
+  const cy = window.resourceTreeCy;
+  const normalized = query.trim().toLocaleLowerCase('es');
+  if(!cy || !normalized){ clearResourceTreeSelection(); return; }
+  const node = cy.nodes().filter(candidate=>{
+    const resource = RESOURCE_MAP[candidate.id()];
+    return resource && `${resource.name} ${resource.en}`.toLocaleLowerCase('es').includes(normalized);
+  }).first();
+  if(node && node.length){
+    node.removeClass('tree-hidden');
+    selectResourceTreeNode(node);
+    cy.animate({center:{eles:node}, zoom:Math.max(cy.zoom(),1.05)},{duration:180});
+  }
+}
+
+function resourceTreeCenter(){ if(window.resourceTreeCy) window.resourceTreeCy.fit(window.resourceTreeCy.elements(':visible'),44); }
+function resourceTreeReset(){
+  const search = document.getElementById('resource-tree-search');
+  if(search) search.value = '';
+  applyResourceTreeFilter('all');
+  resourceTreeCenter();
 }
 
 /* ============================================================
